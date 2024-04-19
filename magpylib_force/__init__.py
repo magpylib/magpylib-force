@@ -6,7 +6,7 @@ The magpylib-force package sits on top of magpylib for force computation
 """
 
 # module level dunders
-__version__ = "0.1.5"
+__version__ = "0.1.6"
 __author__ = "SAL"
 __all__ = [
     "getFTcube",
