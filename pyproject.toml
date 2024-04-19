@@ -1,0 +1,14 @@
+[project]
+name = "mforce"
+version = "0.1.2dev"
+dependencies = [
+    "numpy>=1.20",
+    "scipy>=1.7",
+    "magpylib>=5.0.1",
+    ]
+requires-python = ">=3.10"
+authors = [
+    {name = "Michael Ortner", email = "michael.ortner@silicon-austria.com"},
+]
+readme = "README.md"
+license = {file = "LICENSE"}
