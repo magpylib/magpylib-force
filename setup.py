@@ -22,9 +22,9 @@ setup(
     description=_short_description,
     long_description=readme_text,
     long_description_content_type="text/markdown",
-    author="Alexandre Boisselet",
+    author="Magpylib",
     author_email="magpylib@gmail.com",
-    url=("https://github.com/" "magpylib/magpylib-material-response"),
+    url=("https://github.com/" "magpylib/magpylib-force"),
     license="MIT",
     packages=find_packages(),
     # include anything specified in Manifest.in
