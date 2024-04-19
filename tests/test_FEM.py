@@ -1,6 +1,6 @@
 import numpy as np
 import magpylib as magpy
-from mforce.force import getFTcube
+from magpylib_force.force import getFTcube
 
 
 def test_ANSYS_cube_cube():

@@ -1,7 +1,7 @@
 import numpy as np
 import magpylib as magpy
-from mforce.force import getFTcube
-from mforce.force import getFTwire
+from magpylib_force.force import getFTcube
+from magpylib_force.force import getFTwire
 
 def test_getFTwire_target_inputs_01():
     """

@@ -1,9 +1,9 @@
 import numpy as np
 import magpylib as magpy
-from mforce.mesh import mesh_cuboid
-from mforce.utility import check_input_anchor
-from mforce.utility import check_input_targets_Cuboid
-from mforce.utility import check_input_targets_Polyline
+from magpylib_force.mesh import mesh_cuboid
+from magpylib_force.utility import check_input_anchor
+from magpylib_force.utility import check_input_targets_Cuboid
+from magpylib_force.utility import check_input_targets_Polyline
 
 
 def getFTcube(sources, targets, eps=1e-5, anchor=None, squeeze=True):
