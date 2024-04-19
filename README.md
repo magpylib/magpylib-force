@@ -1,6 +1,6 @@
-# Magpy-Force
+# Magpylib-Force
 
-This package provides force and torque computation for Magpylib objects.
+This package provides force and torque computation for Magpylib objects. Its work in progress and will finally be integrate into the Magpylib package.
 
 # Installation
 
