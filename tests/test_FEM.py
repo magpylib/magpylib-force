@@ -1,6 +1,7 @@
 import numpy as np
 import magpylib as magpy
 from magpylib_force.force import getFTcube
+from magpylib_force.force import getFTwire
 
 
 def test_ANSYS_cube_cube():
@@ -40,3 +41,53 @@ def test_ANSYS_cube_cube():
         assert errF < 0.04
         errT = np.linalg.norm(T - T_fe[i])/np.linalg.norm(T)
         assert errT < 0.25
+
+
+def test_ANSYS_loop_loop():
+    """
+    compare to ANSYS loop-loop computation
+    Warning: ANSYS computes force very inaccurately and torque is completely off
+    """
+    data = (
+        (0.5,0.25,-500,-0.378990675610971,1.16471535508468,-3.93840492731175,0.316391999895969,-0.323117059194582,0.554105980303591),
+        (0.5,0.25,500,0.52319608703649,0.477119683892785,-3.95525312585684,-0.344823150943224,-0.32983037884051,0.548719111194436),
+        (0.5,1.75,-500,-0.247318906984941,-0.475750180468637,2.20298358334411,-0.112567180482201,0.0876390943086132,0.40936448187346),
+        (0.5,1.75,500,0.271711794735348,-0.229983825017913,2.51566260990816,0.091544957851064,0.0899073023482688,0.413415626972563),
+        (1.5,0.25,-500,0.938566291200263,-2.02436288094611,-7.4080821527953,-0.618507366424736,1.99422271236167,3.65138404864739),
+        (1.5,0.25,500,-0.00216325664572926,-2.1084068976844,-6.54170362000025,0.5995369738223,2.00706353179035,3.67068375878204),
+        (1.5,0.5,500,-0.523860907171043,-1.99575639650359,-0.940337877715457,0.429197197716147,1.28142571497163,1.8011336159446),
+        (1.5,1.75,-500,-0.328463925710092,-0.738926572407658,3.6506362987988,-0.0893135956299432,0.26486293279763,0.263853801870998),
+        (1.5,1.75,500,-0.143145542837849,-0.277054173217136,2.16655477926914,0.0843493800576269,0.246120004205157,0.234717784641934),
+    )
+
+    i_squ = 0.5
+    i_circ = 10
+
+    verts1 = np.array(((.5,.5,0),(-.5,.5,0),(-.5,-.5,0),(.5,-.5,0),(.5,.5,0)))*1e-3
+    sloop = magpy.current.Polyline(
+        vertices=verts1,
+        current=i_squ,
+    )
+    sloop.mesh = 100
+    ts = np.linspace(0,2*np.pi,100)
+    verts2 = 1.975*np.array([(np.cos(t), np.sin(t), 0) for t in ts])*1e-3
+    cloop = magpy.current.Polyline(
+        vertices=verts2,
+        current=i_circ
+    )
+    cloop.mesh=3
+
+    for d in data:
+        c1y, c1z, c1x = d[:3]
+        pos = np.array((c1x*1e-3,c1y,c1z))*1e-3
+        cloop.position=(pos)
+
+        # fem force
+        F2 = d[6:9]
+
+        # analytical force
+        F3,_ = getFTwire(sources=cloop, targets=sloop)
+        F3 *= 1e6
+
+        err = np.linalg.norm(F2-F3)/np.linalg.norm(F3)
+        assert err<0.1
