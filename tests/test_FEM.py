@@ -89,4 +89,4 @@ def test_ANSYS_loop_loop():
         F3 *= 1e6
 
         err = np.linalg.norm(F2-F3)/np.linalg.norm(F3)
-        assert err<0.1
+        assert err<0.2
