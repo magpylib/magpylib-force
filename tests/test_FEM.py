@@ -3,7 +3,6 @@ import magpylib as magpy
 from magpylib_force.force import getFTcube
 from magpylib_force.force import getFTwire
 
-
 def test_ANSYS_cube_cube():
     """
     compare to ANSYS values using EXP04
