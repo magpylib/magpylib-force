@@ -15,9 +15,9 @@ def test_getFTwire_target_inputs_01():
     )
     wire2 = wire1.copy()
     wire3 = wire1.copy()
-    wire1.mesh=20
-    wire2.mesh=20
-    wire3.mesh=20
+    wire1.meshing=20
+    wire2.meshing=20
+    wire3.meshing=20
 
     F1,T1 = getFTwire(src1, wire1, anchor=(0,0,0))
     F2,T2 = getFTwire(src1, [wire1], anchor=(0,0,0))

@@ -30,7 +30,7 @@ def test_ANSYS_cube_cube():
         dimension=(.3,.3,.3),
         polarization=(0,0,1),
     )
-    tgt.mesh=(10,10,10)
+    tgt.meshing=(10,10,10)
 
     for i,poz in enumerate(tgt_pos):
         tgt.position = poz
@@ -67,14 +67,14 @@ def test_ANSYS_loop_loop():
         vertices=verts1,
         current=i_squ,
     )
-    sloop.mesh = 100
+    sloop.meshing = 100
     ts = np.linspace(0,2*np.pi,100)
     verts2 = 1.975*np.array([(np.cos(t), np.sin(t), 0) for t in ts])*1e-3
     cloop = magpy.current.Polyline(
         vertices=verts2,
         current=i_circ
     )
-    cloop.mesh=3
+    cloop.meshing=3
 
     for d in data:
         c1y, c1z, c1x = d[:3]
@@ -141,8 +141,8 @@ def test_ANSYS_loop_magnet():
         T2 = dat2[3:6]
         T1 = dat2[6:9]
 
-        loop.mesh = 1000
-        magnet.mesh=(10,20,10)
+        loop.meshing = 1000
+        magnet.meshing=(10,20,10)
         F3,T3 = getFTcube(sources=loop, targets=magnet, anchor=(0,0,0))
         F4,T4 = getFTwire(sources=magnet, targets=loop, anchor=(0,0,0))
         F3 *= 1e3

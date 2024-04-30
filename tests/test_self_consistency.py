@@ -17,8 +17,8 @@ from magpylib_force.force import getFTwire
 #         polarization=((3,2,1), "T"),
 #         position=((2,2,.5), "mm")
 #     )
-#     cube1.mesh = (20,10,10)
-#     cube2.mesh = (10,10,20)
+#     cube1.meshing = (20,10,10)
+#     cube2.meshing = (10,10,20)
 
 #     F1,_ = getFTcube(cube1, cube2)
 #     F2,_ = getFTcube(cube2, cube1)
@@ -48,8 +48,8 @@ def test_consistency_cube_cube():
         polarization=(3,2,1),
         position=(2,2,.5)
     )
-    cube1.mesh = (20,10,10)
-    cube2.mesh = (10,10,20)
+    cube1.meshing = (20,10,10)
+    cube2.meshing = (10,10,20)
 
     #F1,_ = getFTcube(cube1, cube2)
     #F2,_ = getFTcube(cube2, cube1)
@@ -73,12 +73,12 @@ def test_consistency_cube_cube():
 #         current=(1, "A"),
 #         vertices=([(1,0,0),(0,1,.2), (-1,0,0), (0,-1,.5), (1,0,0)], "m"),
 #     )
-#     wire1.mesh=(200)
+#     wire1.meshing=(200)
 #     wire2 = magpy.current.Polyline(
 #         current=(1, "A"),
 #         vertices=([(-1,-1,.5), (-1,1,1), (1,1,2), (1,-1,1), (-1,-1,.5)], "m"),
 #     )
-#     wire2.mesh=(200)
+#     wire2.meshing=(200)
 #     F1a,_ = getFTwire(wire1, wire2)
 #     F2a,_ = getFTwire(wire2, wire1)
 #     errFa = np.linalg.norm(F1a+F2a) / np.linalg.norm(F1a-F2a)
@@ -100,12 +100,12 @@ def test_consistency_loop_loop():
         current=1,
         vertices=[(1,0,0),(0,1,.2), (-1,0,0), (0,-1,.5), (1,0,0)],
     )
-    wire1.mesh=(200)
+    wire1.meshing=(200)
     wire2 = magpy.current.Polyline(
         current=1,
         vertices=[(-1,-1,.5), (-1,1,1), (1,1,2), (1,-1,1), (-1,-1,.5)],
     )
-    wire2.mesh=(200)
+    wire2.meshing=(200)
     F1a,_ = getFTwire(wire1, wire2)
     F2a,_ = getFTwire(wire2, wire1)
     errFa = np.linalg.norm(F1a+F2a) / np.linalg.norm(F1a-F2a)
@@ -127,12 +127,12 @@ def test_consistency_loop_loop():
 #         polarization=((1,2,3), "T"),
 #         dimension=((.6,.4,.2), "m"),
 #     )
-#     magnet.mesh=(30,20,10)
+#     magnet.meshing=(30,20,10)
 #     wire = magpy.current.Polyline(
 #         current=(1, "A"),
 #         vertices=([(-1,-1,.5), (-1,1,1), (1,1,.1), (1,-1,1), (-1,-1,.5)], "m"),
 #     )
-#     wire.mesh=(200)
+#     wire.meshing=(200)
 #     F1a,_ = getFTcube(wire, magnet)
 #     F2a,_ = getFTwire(magnet, wire)
 #     errFa = np.linalg.norm(F1a+F2a) / np.linalg.norm(F1a-F2a)*2
@@ -153,12 +153,12 @@ def test_consistency_cube_loop():
         polarization=(1,2,3),
         dimension=(.6,.4,.2),
     )
-    magnet.mesh=(30,20,10)
+    magnet.meshing=(30,20,10)
     wire = magpy.current.Polyline(
         current=1,
         vertices=[(-1,-1,.5), (-1,1,1), (1,1,.1), (1,-1,1), (-1,-1,.5)],
     )
-    wire.mesh=(200)
+    wire.meshing=(200)
     #F1a,_ = getFTcube(wire, magnet)
     #F2a,_ = getFTwire(magnet, wire)
     #errFa = np.linalg.norm(F1a+F2a) / np.linalg.norm(F1a-F2a)*2

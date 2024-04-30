@@ -17,7 +17,7 @@ from magpylib_force.force import getFTwire
 #         current=(1, "A"),
 #         vertices=(verts, "m"),
 #     )
-#     cloop.mesh = 1
+#     cloop.meshing = 1
 
 #     # homogeneous field
 #     def func(field, observers):
@@ -44,7 +44,7 @@ from magpylib_force.force import getFTwire
 #         current=(1, "A"),
 #         vertices=(verts, "m"),
 #     )
-#     rloop.mesh = 10
+#     rloop.meshing = 10
 
 #     # without anchor
 #     F,T = getFTwire(hom, rloop, Tanch=None)
@@ -71,7 +71,7 @@ def test_physics_loop_torque():
         current=1,
         vertices=verts,
     )
-    cloop.mesh = 1
+    cloop.meshing = 1
 
     # homogeneous field
     def func(field, observers):
@@ -98,7 +98,7 @@ def test_physics_loop_torque():
         current=1,
         vertices=verts,
     )
-    rloop.mesh = 10
+    rloop.meshing = 10
 
     # without anchor
     F,T = getFTwire(hom, rloop, anchor=None)
@@ -127,7 +127,7 @@ def test_physics_loop_torque():
 #         vertices=([(-1000,0,0),(0,0,0),(1000,0,0)], "m"),
 #         position=((0,0,1), "m"),
 #     )
-#     tgt.mesh = 1000
+#     tgt.meshing = 1000
 
 #     F,_ = getFTwire(src, tgt)
 
@@ -147,7 +147,7 @@ def test_physics_parallel_wires():
         vertices=[(-1000,0,0),(1000,0,0)],
     )
     wire2 = wire1.copy(position=(0,0,1))
-    wire2.mesh = 1000
+    wire2.meshing = 1000
 
     F,_ = getFTwire(wire1, wire2)
 
@@ -171,7 +171,7 @@ def test_physics_parallel_wires():
 #         vertices=([(0,-1000,0),(0,0,0),(0,1000,0)], "m"),
 #         position=((0,0,1), "m"),
 #     )
-#     tgt.mesh = 1000
+#     tgt.meshing = 1000
 
 #     ureg=src.current._REGISTRY
 #     F,T = getFTwire(src, tgt)
@@ -193,7 +193,7 @@ def test_physics_perpendicular_wires():
         vertices=[(0,-1000,0),(0,0,0),(0,1000,0)],
         position=(0,0,1),
     )
-    wire2.mesh = 1000
+    wire2.meshing = 1000
 
     F,T = getFTwire(wire1, wire2)
 
@@ -213,7 +213,7 @@ def test_cube_loop_replacement():
         dimension=(2,2,2),
         position=(1,2,3)
     )
-    cube.mesh=(20,20,20)
+    cube.meshing=(20,20,20)
     nn=150
     currs = []
     for z in np.linspace(-1,1,nn):
@@ -222,7 +222,7 @@ def test_cube_loop_replacement():
             vertices=((-1,-1,z),(1,-1,z),(1,1,z),(-1,1,z),(-1,-1,z)),
             position=(1,2,3)
         )
-        loop.mesh = nn
+        loop.meshing = nn
         currs.append(loop)
 
     F1,T1 = getFTcube(gen, cube, anchor=np.array((0,0,0)))
