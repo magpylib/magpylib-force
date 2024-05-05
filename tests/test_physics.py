@@ -225,9 +225,7 @@ def test_cube_loop_replacement():
         currs.append(loop)
 
     F1,T1 = getFT(gen, cube, anchor=np.array((0,0,0)))
-    F2,T2 = getFT(gen, currs, anchor=np.array((0,0,0)))
-    F2 = np.sum(F2,axis=0)
-    T2 = np.sum(T2,axis=0)
+    F2,T2 = np.sum(getFT(gen, currs, anchor=np.array((0,0,0))), axis=0)
 
     assert np.amax(abs((F1-F2)/(F1+F2)*2))<1e-2
     assert np.amax(abs((T1-T2)/(T1+T2)*2))<1e-2

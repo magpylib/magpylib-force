@@ -19,21 +19,17 @@ def test_getFT_target_inputs_01():
     wire2.meshing=20
     wire3.meshing=20
 
-    F1,T1 = getFT(src1, wire1, anchor=(0,0,0))
-    F2,T2 = getFT(src1, [wire1], anchor=(0,0,0))
-    F3,T3 = getFT(src1, [wire1,wire2,wire3], anchor=(0,0,0))
-    np.testing.assert_allclose(F1,F2)
-    np.testing.assert_allclose(F1,F3[0])
-    np.testing.assert_allclose(F1,F3[1])
-    np.testing.assert_allclose(F1,F3[2])
+    FT1 = getFT(src1, wire1, anchor=(0,0,0))
+    FT2 = getFT(src1, [wire1], anchor=(0,0,0))
+    FT3 = getFT(src1, [wire1,wire2,wire3], anchor=(0,0,0))
     
-    np.testing.assert_allclose(T1,T2)
-    np.testing.assert_allclose(T1,T3[0])
-    np.testing.assert_allclose(T1,T3[1])
-    np.testing.assert_allclose(T1,T3[2])
+    np.testing.assert_allclose(FT1,FT2)
+    np.testing.assert_allclose(FT1,FT3[0])
+    np.testing.assert_allclose(FT1,FT3[1])
+    np.testing.assert_allclose(FT1,FT3[2])
 
-    F4,T4 = getFT(src1, wire1, anchor=(0,0,0))
-    F5,T5 = getFT([src1, src2], wire1, anchor=(0,0,0))
+    FT4 = getFT(src1, wire1, anchor=(0,0,0))
+    FT5 = getFT([src1, src2], wire1, anchor=(0,0,0))
     
-    np.testing.assert_allclose(F4*2,F5)
-    np.testing.assert_allclose(T4*2,T5)
+    np.testing.assert_allclose(FT4*2,FT5)
+    np.testing.assert_allclose(FT4*2,FT5)

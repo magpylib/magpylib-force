@@ -227,10 +227,8 @@ def test_ANSYS_magnet_current_close():
             wire.current = i0
         magnet.position = pos + np.array((0,0,.15))*1e-3
 
-        F1,T1 = getFT(wires, magnet, anchor=(0,0,0))
-        F2,T2 = getFT(magnet, wires, anchor=(0,0,0))
-        F2 = np.sum(F2, axis=0)
-        T2 = np.sum(T2, axis=0)
+        F1,_ = getFT(wires, magnet, anchor=(0,0,0))
+        F2,T2 = np.sum(getFT(magnet, wires, anchor=(0,0,0)), axis=0)
 
         assert np.linalg.norm(F1+F2)/np.linalg.norm(F1) < 1e-3
         assert np.linalg.norm(f2-F2)/np.linalg.norm(F2) < 1e-2
