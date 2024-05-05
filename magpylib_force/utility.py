@@ -18,19 +18,37 @@ def check_input_anchor(anchor):
     return anchor
 
 
-def check_input_targets_Cuboid(targets):
+def check_input_targets(targets):
     """ check and format targets input """
-    if isinstance(targets, Cuboid):
-        targets = [targets]
     if not isinstance(targets, list):
-        raise ValueError("Bad targets input.")
+        targets = [targets]
+    for t in targets:
+        if not isinstance(t, (Cuboid, Polyline)):
+            raise ValueError(
+                "Bad `targets` input for getFT."
+                " `targets` can only be Cuboids and Polylines."
+                f" Instead receivd type {type(t)} target."
+            )
+        if not hasattr(t, "meshing"):
+            raise ValueError(
+                "Bad `targets` input for getFT."
+                " `targets` must have the `meshing` parameter set."
+            )
     return targets
 
+# def check_input_targets_Cuboid(targets):
+#     """ check and format targets input """
+#     if isinstance(targets, Cuboid):
+#         targets = [targets]
+#     if not isinstance(targets, list):
+#         raise ValueError("Bad targets input.")
+#     return targets
 
-def check_input_targets_Polyline(targets):
-    """ check and format targets input """
-    if isinstance(targets, Polyline):
-        targets = [targets]
-    if not isinstance(targets, list):
-        raise ValueError("Bad targets input.")
-    return targets
+
+# def check_input_targets_Polyline(targets):
+#     """ check and format targets input """
+#     if isinstance(targets, Polyline):
+#         targets = [targets]
+#     if not isinstance(targets, list):
+#         raise ValueError("Bad targets input.")
+#     return targets

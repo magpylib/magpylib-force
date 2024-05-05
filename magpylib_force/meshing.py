@@ -9,7 +9,7 @@ def mesh_cuboid(object):
     returns grid positions relative to cuboid position
     """
     a,b,c = object.dimension
-    n1,n2,n3 = object.mesh
+    n1,n2,n3 = object.meshing
     xs = np.linspace(-a/2, a/2, n1+1)
     ys = np.linspace(-b/2, b/2, n2+1)
     zs = np.linspace(-c/2, c/2, n3+1)
@@ -52,7 +52,7 @@ def mesh_cuboid_old2(object, verbose=False):
     grid positions: np.ndarray shape (m,3)
     """
     a,b,c = object.dimension
-    splitting = object.mesh
+    splitting = object.meshing
     if isinstance(splitting, (float, int)):
         x = (a*b*c/splitting)**(1/3)
         n1 = m.ceil(a/x)
