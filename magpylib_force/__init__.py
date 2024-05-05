@@ -5,7 +5,7 @@ The magpylib-force package sits on top of magpylib for force computation
 """
 
 # module level dunders
-__version__ = "0.1.8"
+__version__ = "0.1.7"
 __author__ = "SAL"
 __all__ = [
     "getFT",
