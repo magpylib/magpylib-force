@@ -1,7 +1,7 @@
 import numpy as np
 import magpylib as magpy
-from magpylib_force.force import getFTcube
-from magpylib_force.force import getFTwire
+from magpylib_force.force import getFT
+
 
 def test_ANSYS_cube_cube():
     """
@@ -34,7 +34,7 @@ def test_ANSYS_cube_cube():
 
     for i,poz in enumerate(tgt_pos):
         tgt.position = poz
-        F,T = getFTcube(gen, tgt)
+        F,T = getFT(gen, tgt)
 
         errF = np.linalg.norm(F - F_fe[i])/np.linalg.norm(F)
         assert errF < 0.04
@@ -85,7 +85,7 @@ def test_ANSYS_loop_loop():
         F2 = d[6:9]
 
         # analytical force
-        F3,_ = getFTwire(sources=cloop, targets=sloop)
+        F3,_ = getFT(sources=cloop, targets=sloop)
         F3 *= 1e6
 
         err = np.linalg.norm(F2-F3)/np.linalg.norm(F3)
@@ -143,8 +143,8 @@ def test_ANSYS_loop_magnet():
 
         loop.meshing = 1000
         magnet.meshing=(10,20,10)
-        F3,T3 = getFTcube(sources=loop, targets=magnet, anchor=(0,0,0))
-        F4,T4 = getFTwire(sources=magnet, targets=loop, anchor=(0,0,0))
+        F3,T3 = getFT(sources=loop, targets=magnet, anchor=(0,0,0))
+        F4,T4 = getFT(sources=magnet, targets=loop, anchor=(0,0,0))
         F3 *= 1e3
         F4 *= 1e3
         T3 *= 1e6
@@ -158,3 +158,80 @@ def test_ANSYS_loop_magnet():
         assert err < 0.15
         err = np.linalg.norm(T1+T4)/np.linalg.norm(T4)
         assert err < 0.15
+
+
+
+def test_ANSYS_magnet_current_close():
+    """curren loop close to magnet"""
+
+    magnet = magpy.magnet.Cuboid(
+        dimension=np.array((.5, 10, .3))*1e-3,
+        polarization=(1,0,0),
+    )
+    magnet.meshing = (5,50,3)
+
+    # wire spit up into 4 parts
+    d = .025 # put PolyLine in center of crosssection
+    t = 0.01 # put PolyLine in center of crosssection
+    verts1 = np.array(((-.25+d,-4+d,t), (.25-d,-4+d,t), (.25-d,4-d,t), (-.25+d,4-d,t), (-.25+d,-4+d,t)))*1e-3
+    discr = 10*1e3 # wire discretizations per meter
+    wires = []
+    for i in range(4):
+        wire = magpy.current.Polyline(vertices=(verts1[i:i+2]))
+        mw = int(discr*np.linalg.norm(verts1[i]-verts1[i+1]))+1
+        wire.meshing = mw
+        wires.append(wire)
+
+    #"I_square [mA]","yy [mm]","zz [mm]","xx [um]","F_square.Force_x [uNewton]","F_square.Force_y [uNewton]","F_square.Force_z [uNewton]","Fv_magnet.Force_x [uNewton]","Fv_magnet.Force_y [uNewton]","Fv_magnet.Force_z [uNewton]"
+    datF = np.array((
+        (50,0,0.2,200,-38.697482833418,0.0002242350531848,59.4310879419995,29.0564031184439,7.11803882106958,-47.9368393911027),
+        (50,0,0.2,500,31.1552670207915,-0.00142810245237877,29.8624423913996,-65.3924604890968,11.4789019916509,-51.8408330694864),
+        (50,0,0.2,800,15.1908535165256,-3.87787107323596E-05,-2.59112312011276,-10.2503856180475,3.77071833140656,-40.2905673214654),
+        (50,1,0.2,200,-38.2166912173904,0.74775728098968,59.1285115576116,-7.1275613537107,-8.16434162283945,-70.8158765538541),
+        (50,1,0.2,500,30.9248391472397,0.711934423270261,29.7711197385536,-47.0335059106064,5.30602983129916,-94.6243138266417),
+        (50,1,0.2,800,14.9818522746782,0.285580482211302,-2.48002525728516,-17.4778153030685,14.3839498468311,-33.3455008748144),
+        (50,0,0.5,200,-15.4440842393698,0.000630278271938781,13.8040620063476,-29.3586587495271,-7.04552102088018,-31.9675710200005),
+        (50,0,0.5,500,2.40460818037774,-0.000453637988892101,14.3771835667471,59.7897254642478,-7.72738474941987,-5.30574925396906),
+        (50,0,0.5,800,6.6367471620929,0.000255164078938144,4.82949919020895,-18.5474946200134,1.33369577647253,-10.881515270821),
+        (50,1,0.5,200,-15.145226144758,0.235812935580012,13.6277157811128,-1.85120493391665,-2.66991565009376,-10.0791303759911),
+        (50,1,0.5,500,2.40322610295551,0.343272487193449,14.182570171465,42.5947990318086,8.34168525083406,-3.27399171150132),
+        (50,1,0.5,800,6.52589219503979,0.243370384679762,4.7572297397883,-42.1269990492652,-7.52176458860419,-4.45812096051993),
+    ))
+    #"I_square [mA]","yy [mm]","zz [mm]","xx [um]","Tvx_m.Torque [nNewtonMeter]","Tvy_m.Torque [nNewtonMeter]","Tvz_m.Torque [nNewtonMeter]","Tx_square.Torque [nNewtonMeter]","Ty_square.Torque [nNewtonMeter]","Tz_square.Torque [nNewtonMeter]"
+    datT = np.array((
+        (50,0,0.2,200,100.376931034983,1.29132310544713,-44.5742433626561,0.0135554469175028,-12.259497183979,0.0234822598655818),
+        (50,0,0.2,500,-35.3674218480089,15.2488447927969,16.5356714838072,0.0128574072989242,-2.11323611976223,0.0140856152834011),
+        (50,0,0.2,800,78.1145191288726,28.9160470934922,42.7406950893594,-0.00270261511070544,3.82101753288969,0.001268285244331),
+        (50,1,0.2,200,253.962525714332,-3.58528490354542,-18.3631031181225,0.906354335079891,-11.983108298508,1.88954778000799),
+        (50,1,0.2,500,4.46861420652312,17.1480742529462,29.6735385079683,0.0283925165409689,-2.05547893566587,-0.837502175937236),
+        (50,1,0.2,800,-134.966632069798,26.1191706299256,-3.58074585018869,-0.728913411271276,3.76373308619741,-0.751039454165596),
+        (50,0,0.5,200,-23.9024071346421,-17.6356253739313,-183.322034423475,0.00115987401080014,-6.23683839052518,0.00221598446713591),
+        (50,0,0.5,500,2.78526886521961,31.7179118567721,-24.2255502578008,0.00550707289213479,-2.67769582918341,-0.00468607713562535),
+        (50,0,0.5,800,-40.0407569434816,3.37798020460892,-39.931893857586,-0.00396662587435437,0.350027477836724,-0.00218198771623613),
+        (50,1,0.5,200,-2.0307023796287,0.583836236430798,75.3662429442374,0.542371195596806,-6.0801890938976,1.19222997481852),
+        (50,1,0.5,500,23.698487998103,18.7804224066191,51.5633199828762,0.51802382216635,-2.60537736999987,0.0549590129589455),
+        (50,1,0.5,800,145.274705178714,-19.4722759246531,6.63502773049354,0.0223391263649002,0.348069100595905,-0.392873453263144),
+    ))
+
+    n = len(datF)
+    for i,(d,t) in enumerate(zip(datF, datT)):
+        i0 = d[0]*1e-3 #ampere
+        pos = np.array((d[3]*1e-3, d[1], d[2]))*1e-3
+        f2 = np.array((d[4], d[5], d[6]))*1e-6
+        f1 = np.array((d[7], d[8], d[9]))*1e-6
+
+        t1 = np.array((t[4], t[5], t[6]))*1e-9
+        t2 = np.array((t[7], t[8], t[9]))*1e-9
+        
+        for wire in wires:
+            wire.current = i0
+        magnet.position = pos + np.array((0,0,.15))*1e-3
+
+        F1,T1 = getFT(wires, magnet, anchor=(0,0,0))
+        F2,T2 = getFT(magnet, wires, anchor=(0,0,0))
+        F2 = np.sum(F2, axis=0)
+        T2 = np.sum(T2, axis=0)
+
+        assert np.linalg.norm(F1+F2)/np.linalg.norm(F1) < 1e-3
+        assert np.linalg.norm(f2-F2)/np.linalg.norm(F2) < 1e-2
+        assert np.linalg.norm(t2+T2)/np.linalg.norm(T2) < 0.1

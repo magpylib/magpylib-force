@@ -1,7 +1,6 @@
 import numpy as np
 import magpylib as magpy
-from magpylib_force.force import getFTcube
-from magpylib_force.force import getFTwire
+from magpylib_force.force import getFT
 
 
 # def test_physics_loop_torque():
@@ -25,12 +24,12 @@ from magpylib_force.force import getFTwire
 #     hom = magpy.misc.CustomSource(field_func=func)
 
 #     # without anchor
-#     F,T = getFTwire(hom, cloop, Tanch=None)
+#     F,T = getFT(hom, cloop, Tanch=None)
 #     assert np.amax(F.magnitude) < 1e-14
 #     assert T.magnitude == 0
 
 #     # with anchor
-#     F,T = getFTwire(hom, cloop, Tanch=cloop.position)
+#     F,T = getFT(hom, cloop, Tanch=cloop.position)
 #     assert np.amax(abs(F.magnitude)) < 1e-14
 #     assert abs(T[0].magnitude) < 1e-14
 #     assert abs(T[1].magnitude - np.pi ) < 1e-3
@@ -47,12 +46,12 @@ from magpylib_force.force import getFTwire
 #     rloop.meshing = 10
 
 #     # without anchor
-#     F,T = getFTwire(hom, rloop, Tanch=None)
+#     F,T = getFT(hom, rloop, Tanch=None)
 #     assert np.amax(F.magnitude) < 1e-14
 #     assert T.magnitude == 0
 
 #     # with anchor
-#     F,T = getFTwire(hom, rloop, Tanch=rloop.position)
+#     F,T = getFT(hom, rloop, Tanch=rloop.position)
 #     assert np.amax(abs(F.magnitude)) < 1e-14
 #     assert abs(T[0].magnitude) < 1e-14
 #     assert abs(T[1].magnitude + 4 ) < 1e-3
@@ -79,12 +78,12 @@ def test_physics_loop_torque():
     hom = magpy.misc.CustomSource(field_func=func)
 
     # without anchor
-    F,T = getFTwire(hom, cloop, anchor=None)
-    assert np.amax(F) < 1e-14
-    assert T == 0
+    F,T = getFT(hom, cloop, anchor=None)
+    assert np.amax(abs(F)) < 1e-14
+    assert np.amax(abs(T)) == 0
 
     # with anchor
-    F,T = getFTwire(hom, cloop, anchor=cloop.position)
+    F,T = getFT(hom, cloop, anchor=cloop.position)
     assert np.amax(abs(F)) < 1e-14
     assert abs(T[0]) < 1e-14
     assert abs(T[1] - np.pi ) < 1e-3
@@ -101,12 +100,12 @@ def test_physics_loop_torque():
     rloop.meshing = 10
 
     # without anchor
-    F,T = getFTwire(hom, rloop, anchor=None)
-    assert np.amax(F) < 1e-14
-    assert T == 0
+    F,T = getFT(hom, rloop, anchor=None)
+    assert np.amax(abs(F)) < 1e-14
+    assert np.amax(abs(T)) == 0
 
     # with anchor
-    F,T = getFTwire(hom, rloop, anchor=rloop.position)
+    F,T = getFT(hom, rloop, anchor=rloop.position)
     assert np.amax(abs(F)) < 1e-14
     assert abs(T[0]) < 1e-14
     assert abs(T[1] + 4 ) < 1e-3
@@ -129,7 +128,7 @@ def test_physics_loop_torque():
 #     )
 #     tgt.meshing = 1000
 
-#     F,_ = getFTwire(src, tgt)
+#     F,_ = getFT(src, tgt)
 
 #     Fanalytic = 2*magpy.mu_0/4/np.pi*2000
 
@@ -149,7 +148,7 @@ def test_physics_parallel_wires():
     wire2 = wire1.copy(position=(0,0,1))
     wire2.meshing = 1000
 
-    F,_ = getFTwire(wire1, wire2)
+    F,_ = getFT(wire1, wire2)
 
     Fanalytic = 2*magpy.mu_0/4/np.pi*2000
 
@@ -174,7 +173,7 @@ def test_physics_parallel_wires():
 #     tgt.meshing = 1000
 
 #     ureg=src.current._REGISTRY
-#     F,T = getFTwire(src, tgt)
+#     F,T = getFT(src, tgt)
 
 #     assert np.max(abs(F.magnitude)) < 1e-14
 
@@ -195,7 +194,7 @@ def test_physics_perpendicular_wires():
     )
     wire2.meshing = 1000
 
-    F,T = getFTwire(wire1, wire2)
+    F,T = getFT(wire1, wire2)
 
     assert np.max(abs(F)) < 1e-14
 
@@ -225,8 +224,8 @@ def test_cube_loop_replacement():
         loop.meshing = nn
         currs.append(loop)
 
-    F1,T1 = getFTcube(gen, cube, anchor=np.array((0,0,0)))
-    F2,T2 = getFTwire(gen, currs, anchor=np.array((0,0,0)))
+    F1,T1 = getFT(gen, cube, anchor=np.array((0,0,0)))
+    F2,T2 = getFT(gen, currs, anchor=np.array((0,0,0)))
     F2 = np.sum(F2,axis=0)
     T2 = np.sum(T2,axis=0)
 

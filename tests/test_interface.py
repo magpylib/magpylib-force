@@ -1,9 +1,9 @@
 import numpy as np
 import magpylib as magpy
-from magpylib_force.force import getFTcube
-from magpylib_force.force import getFTwire
+from magpylib_force.force import getFT
 
-def test_getFTwire_target_inputs_01():
+
+def test_getFT_target_inputs_01():
     """
     check different target and source input formats give same
     """
@@ -19,9 +19,9 @@ def test_getFTwire_target_inputs_01():
     wire2.meshing=20
     wire3.meshing=20
 
-    F1,T1 = getFTwire(src1, wire1, anchor=(0,0,0))
-    F2,T2 = getFTwire(src1, [wire1], anchor=(0,0,0))
-    F3,T3 = getFTwire(src1, [wire1,wire2,wire3], anchor=(0,0,0))
+    F1,T1 = getFT(src1, wire1, anchor=(0,0,0))
+    F2,T2 = getFT(src1, [wire1], anchor=(0,0,0))
+    F3,T3 = getFT(src1, [wire1,wire2,wire3], anchor=(0,0,0))
     np.testing.assert_allclose(F1,F2)
     np.testing.assert_allclose(F1,F3[0])
     np.testing.assert_allclose(F1,F3[1])
@@ -32,8 +32,8 @@ def test_getFTwire_target_inputs_01():
     np.testing.assert_allclose(T1,T3[1])
     np.testing.assert_allclose(T1,T3[2])
 
-    F4,T4 = getFTwire(src1, wire1, anchor=(0,0,0))
-    F5,T5 = getFTwire([src1, src2], wire1, anchor=(0,0,0))
+    F4,T4 = getFT(src1, wire1, anchor=(0,0,0))
+    F5,T5 = getFT([src1, src2], wire1, anchor=(0,0,0))
     
     np.testing.assert_allclose(F4*2,F5)
     np.testing.assert_allclose(T4*2,T5)
