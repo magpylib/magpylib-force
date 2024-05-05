@@ -21,7 +21,7 @@ cube1 = magpy.magnet.Cuboid(
 cube2 = cube1.copy(position=(1,0,2))
 cube2.mesh = (10,10,10)
 
-F,T = getFTcube(cube1, [cube2, cube2.copy()], anchor=(0,0,0))
+F,T = getFTcube(cube1, cube2, anchor=(0,0,0))
 print(F)
 print(T)
 ```
