@@ -9,19 +9,25 @@ This package provides force and torque computation for Magpylib objects. Its wor
 # Example code:
 
 ```
+import numpy as np
 import magpylib as magpy
-from mforce import getFTcube
+from magpylib_force import getFT
 
-# all inputs and output in SI units
+source = magpy.magnet.Sphere(diameter=1, polarization=(1,2,3))
 
-cube1 = magpy.magnet.Cuboid(
-    dimension=(1,1,1),
-    polarization=(1,1,1),
+line = magpy.current.Polyline(
+    current=1,
+    vertices=((0,0,3), (-2,0,-1), (2,0,-1), (0,0,3)),
 )
-cube2 = cube1.copy(position=(1,0,2))
-cube2.mesh = (10,10,10)
+line.meshing = 10 # mesh points in each segment
 
-F,T = getFTcube(cube1, [cube2, cube2.copy()], anchor=(0,0,0))
-print(F)
-print(T)
+cube = magpy.magnet.Cuboid(
+    dimension=(1,1,1),
+    polarization=(0,0,1),
+    position=(1,2,3)
+)
+cube.meshing = (2,2,2) # mesh grid
+
+FT = getFT(source, [line, cube])
+print(FT)
 ```
