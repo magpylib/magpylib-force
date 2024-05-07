@@ -229,3 +229,36 @@ def test_cube_loop_replacement():
 
     assert np.amax(abs((F1-F2)/(F1+F2)*2))<1e-2
     assert np.amax(abs((T1-T2)/(T1+T2)*2))<1e-2
+
+
+def test_sphere_cube_at_distance():
+    """
+    A sphere and a cuboid with similar volume should see a similar torque and force
+    at a distance
+    """
+    source = magpy.magnet.Sphere(diameter=1, polarization=(1,2,3))
+
+    J = (3,2,1)
+    pos = (5,-7,11)
+
+    cube = magpy.magnet.Cuboid(
+        dimension=(1,1,1),
+        polarization=J,
+        position=pos
+    )
+    cube.meshing = (2,2,2)
+
+    sphere = magpy.magnet.Sphere(
+        diameter=(6/np.pi)**(1/3),
+        polarization=J,
+        position=pos,
+    )
+    sphere.meshing=2
+
+    FT = getFT(source, [cube, sphere], anchor=(0,0,0))
+
+    errF = (FT[0,0]-FT[1,0])/np.linalg.norm(FT[0,0])
+    errT = (FT[0,1]-FT[1,1])/np.linalg.norm(FT[0,1])
+
+    assert max(abs(errF)) < 1e-5
+    assert max(abs(errT)) < 1e-5

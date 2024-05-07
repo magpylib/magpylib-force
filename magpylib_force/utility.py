@@ -1,7 +1,7 @@
 import numpy as np
 from magpylib._src.obj_classes.class_magnet_Cuboid import Cuboid
 from magpylib._src.obj_classes.class_current_Polyline import Polyline
-
+from magpylib._src.obj_classes.class_magnet_Sphere import Sphere
 
 def check_input_anchor(anchor):
     """
@@ -23,7 +23,7 @@ def check_input_targets(targets):
     if not isinstance(targets, list):
         targets = [targets]
     for t in targets:
-        if not isinstance(t, (Cuboid, Polyline)):
+        if not isinstance(t, (Cuboid, Polyline, Sphere)):
             raise ValueError(
                 "Bad `targets` input for getFT."
                 " `targets` can only be Cuboids and Polylines."

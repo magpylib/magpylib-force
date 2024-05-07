@@ -2,6 +2,32 @@ import numpy as np
 import itertools
 import math as m
 import pint
+from magpylib._src.obj_classes.class_magnet_Cuboid import Cuboid
+from magpylib._src.obj_classes.class_magnet_Sphere import Sphere
+
+def mesh_target(object):
+    """
+    create mesh for target objects
+    """
+    if isinstance(object, Cuboid):
+        return mesh_cuboid(object)
+    elif isinstance(object, Sphere):
+        return mesh_sphere(object)
+    raise RuntimeError("fktn `mesh_target`: should not be here!")
+
+
+def mesh_sphere(object):
+    """
+    create sphere mesh from object meshing parameter
+    """
+    n = object.meshing
+    dia = object.diameter
+    a = -dia/2+dia/(2*n)
+    b =  dia/2-dia/(2*n)
+    c = n*1j
+    mesh = np.mgrid[a:b:c, a:b:c, a:b:c].T.reshape(n**3,3)
+    return mesh[np.linalg.norm(mesh, axis=1)<dia/2]
+
 
 def mesh_cuboid(object):
     """
