@@ -21,13 +21,7 @@ line = magpy.current.Polyline(
 )
 line.meshing = 10 # mesh points in each segment
 
-cube = magpy.magnet.Cuboid(
-    dimension=(1,1,1),
-    polarization=(0,0,1),
-    position=(1,2,3)
-)
-cube.meshing = (2,2,2) # mesh grid
-
-FT = getFT(source, [line, cube])
-print(FT)
+F,T = getFTcube(cube1, cube2, anchor=(0,0,0))
+print(F)
+print(T)
 ```
