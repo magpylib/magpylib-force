@@ -222,7 +222,7 @@ def test_ANSYS_magnet_current_close():
 
         t1 = np.array((t[4], t[5], t[6]))*1e-9
         t2 = np.array((t[7], t[8], t[9]))*1e-9
-        
+
         for wire in wires:
             wire.current = i0
         magnet.position = pos + np.array((0,0,.15))*1e-3

@@ -34,7 +34,7 @@ def test_rotation2():
     test if rotated currents give the same result
     """
     s1 = magpy.magnet.Sphere(diameter=1, polarization=(1,2,3), position=(0,0,-1))
-        
+
     verts1 = [(0,0,0), (1,0,0), (1,1,0), (0,1,0), (0,0,0)]
     verts2 = [(0,0,0), (1,0,0), (1,0,1), (0,0,1), (0,0,0)]
 
