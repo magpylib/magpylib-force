@@ -151,10 +151,20 @@ def getFTmagnet(sources, targets, eps=1e-5, anchor=None):
 
     for i,tgt in enumerate(targets):
         tgt_vol = volume(tgt)
-        inst_mom = tgt.magnetization * tgt_vol / inst_numbers[i]
+        inst_mom = tgt.orientation.apply(tgt.magnetization) * tgt_vol / inst_numbers[i]
         MOM[insti[i]:insti[i+1]] = inst_mom
 
         mesh = mesh_target(tgt)
+        #import matplotlib.pyplot as plt
+        #ax = plt.figure().add_subplot(projection='3d')
+        #ax.plot(mesh[:,0], mesh[:,1], mesh[:,2], ls='', marker='.')
+
+        mesh = tgt.orientation.apply(mesh)
+        #ax.plot(mesh[:,0], mesh[:,1], mesh[:,2], ls='', marker='.', color='r')
+        #plt.show()
+        #import sys
+        #sys.exit()
+
         for j,ev in enumerate(eps_vec):
             POSS[insti[i]:insti[i+1],j] = mesh + ev + tgt.position
 
