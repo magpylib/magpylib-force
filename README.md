@@ -15,7 +15,7 @@ This work is supported by a NUMFOCUS grant: SDG 2024 round 1
 
 # Example code:
 
-```
+```python
 import numpy as np
 import magpylib as magpy
 from magpylib_force import getFT
