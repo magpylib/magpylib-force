@@ -4,7 +4,10 @@ This package provides force and torque computation for Magpylib objects. It is w
 
 This work is supported by a NUMFOCUS grant: SDG 2024 round 1
 
-**Warning:** magpylib-force relies on magpylib version>=5.0.1
+**Warning:**
+- relies on magpylib version>=5.0.1
+- does not work with paths
+- limited target types available
 
 # Installation
 
