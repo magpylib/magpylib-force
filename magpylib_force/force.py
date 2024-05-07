@@ -302,7 +302,7 @@ def getFTcurrent(sources, targets, anchor=None, eps=None):
     CURR = np.zeros((no_inst,))
 
     for i,tgt in enumerate(targets):
-        verts = tgt.vertices
+        verts = tgt.orientation.apply(tgt.vertices)
         mesh = mesh_numbers[i]
 
         lvec = np.repeat(verts[1:] - verts[:-1], mesh, axis=0)/mesh
