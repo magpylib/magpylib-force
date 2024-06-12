@@ -1,7 +1,6 @@
 import numpy as np
 import itertools
 import math as m
-import pint
 from magpylib._src.obj_classes.class_magnet_Cuboid import Cuboid
 from magpylib._src.obj_classes.class_magnet_Sphere import Sphere
 
@@ -48,9 +47,9 @@ def mesh_cuboid(object):
     ys_cent = ys[:-1] + dy/2 if len(ys)>1 else ys + dy/2
     zs_cent = zs[:-1] + dz/2 if len(zs)>1 else zs + dz/2
 
-    if isinstance(a, pint.Quantity):
-        permutas = np.array(list(itertools.product(xs_cent.magnitude, ys_cent.magnitude, zs_cent.magnitude)))
-        return permutas * xs_cent.units
+    # if isinstance(a, pint.Quantity):
+    #     permutas = np.array(list(itertools.product(xs_cent.magnitude, ys_cent.magnitude, zs_cent.magnitude)))
+    #     return permutas * xs_cent.units
 
     return np.array(list(itertools.product(xs_cent, ys_cent, zs_cent)))
 
