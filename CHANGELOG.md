@@ -1,3 +1,7 @@
+# v0.1.9
+- fix docstrings
+- bugfix remove pint dependency from development
+
 # v0.1.8
 - include Sphere magnets
 - rework of getFT workflow
