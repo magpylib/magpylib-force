@@ -84,6 +84,7 @@ def test_physics_loop_torque():
 
     # with anchor
     F,T = getFT(hom, cloop, anchor=cloop.position)
+    T*=-1 #bad sign at initial test design
     assert np.amax(abs(F)) < 1e-14
     assert abs(T[0]) < 1e-14
     assert abs(T[1] - np.pi ) < 1e-3
@@ -106,6 +107,7 @@ def test_physics_loop_torque():
 
     # with anchor
     F,T = getFT(hom, rloop, anchor=rloop.position)
+    T*=-1 #bad sign at initial test design
     assert np.amax(abs(F)) < 1e-14
     assert abs(T[0]) < 1e-14
     assert abs(T[1] + 4 ) < 1e-3
@@ -262,3 +264,32 @@ def test_sphere_cube_at_distance():
 
     assert max(abs(errF)) < 1e-5
     assert max(abs(errT)) < 1e-5
+
+
+def test_torque_sign():
+    """ make sure that torque sign is in the right direction"""
+
+    # Cuboid -> Cuboid
+    mag1 = magpy.magnet.Cuboid(position=(2,0,0), polarization=(1,0,0), dimension=(2,1,1))
+    mag2 = magpy.magnet.Cuboid(position=(-2,0,0), polarization=(1,0,0), dimension=(2,1,1))
+
+    mag1.rotate_from_angax(15, "y")
+    mag1.meshing=(3,3,3)
+
+    _,T = getFT(mag2, mag1)
+
+    assert T[1] < 0
+
+    # Cuboid -> Polyline
+    mag = magpy.magnet.Cuboid(polarization=(0,0,1), dimension=(1,1,2))
+
+    ts = np.linspace(0,2*np.pi,10)
+    verts = [(2*np.cos(t), 2*np.sin(t),0) for t in ts]
+    loop = magpy.current.Polyline(vertices=verts, current=1)
+    loop.rotate_from_angax(15, "y")
+
+    loop.meshing=2
+
+    _,T = getFT(mag, loop, anchor=(0,0,0))
+
+    assert T[1] < 0
