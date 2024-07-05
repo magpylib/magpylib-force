@@ -35,6 +35,7 @@ def test_ANSYS_cube_cube():
     for i,poz in enumerate(tgt_pos):
         tgt.position = poz
         F,T = getFT(gen, tgt)
+        T *= -1 #bad sign in original implementation
 
         errF = np.linalg.norm(F - F_fe[i])/np.linalg.norm(F)
         assert errF < 0.04
@@ -144,7 +145,9 @@ def test_ANSYS_loop_magnet():
         loop.meshing = 1000
         magnet.meshing=(10,20,10)
         F3,T3 = getFT(sources=loop, targets=magnet, anchor=(0,0,0))
+        T3*=-1 #bad sign at initial test design
         F4,T4 = getFT(sources=magnet, targets=loop, anchor=(0,0,0))
+        T4*=-1 #bad sign at initial test design
         F3 *= 1e3
         F4 *= 1e3
         T3 *= 1e6
@@ -229,6 +232,7 @@ def test_ANSYS_magnet_current_close():
 
         F1,_ = getFT(wires, magnet, anchor=(0,0,0))
         F2,T2 = np.sum(getFT(magnet, wires, anchor=(0,0,0)), axis=0)
+        T2*=-1 #bad sign at initial test design
 
         assert np.linalg.norm(F1+F2)/np.linalg.norm(F1) < 1e-3
         assert np.linalg.norm(f2-F2)/np.linalg.norm(F2) < 1e-2

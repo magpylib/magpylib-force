@@ -11,7 +11,8 @@ from magpylib._src.obj_classes.class_magnet_Sphere import Sphere
 
 def getFT(sources, targets, anchor=None, eps=1e-5, squeeze=True):
     """
-    Compute force and torque between sources and targets.
+    Compute magnetic force and torque acting on the targets that are exposed
+    to the magnetic field of the sources.
     SI units are assumed for all inputs and outputs.
 
     Parameters
@@ -181,7 +182,7 @@ def getFTmagnet(sources, targets, eps=1e-5, anchor=None):
     T = np.array([np.sum(Ts[insti[i]:insti[i+1]],axis=0) for i in range(tgt_number)])
     F = np.array([np.sum(Fs[insti[i]:insti[i+1]],axis=0) for i in range(tgt_number)])
 
-    return np.array((F, T))
+    return np.array((F, -T))
 
 
 
@@ -330,4 +331,4 @@ def getFTcurrent(sources, targets, anchor=None, eps=None):
     # sumup force for every target
     F = np.array([np.sum(F[insti[i]:insti[i+1]],axis=0) for i in range(tgt_number)])
 
-    return np.array((F, T))
+    return np.array((F, -T))

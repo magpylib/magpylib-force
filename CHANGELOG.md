@@ -1,3 +1,7 @@
+# v0.1.10
+- improve docstrings
+- fix bad sign of torque
+
 # v0.1.9
 - fix docstrings
 - bugfix remove pint dependency from development
