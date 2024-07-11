@@ -9,6 +9,7 @@ from magpylib._src.obj_classes.class_magnet_Cuboid import Cuboid
 from magpylib._src.obj_classes.class_magnet_Sphere import Sphere
 
 
+
 def getFT(sources, targets, anchor=None, eps=1e-5, squeeze=True):
     """
     Compute magnetic force and torque acting on the targets that are exposed
