@@ -1,3 +1,6 @@
+# v0.1.11
+- class for magnet movement
+
 # v0.1.10
 - improve docstrings
 - fix bad sign of torque
