@@ -1,3 +1,7 @@
+# v0.1.12
+- vectorized version of inertia tensor calculation
+- unit tests for inertia tensor calculation
+
 # v0.1.11
 - class for magnet movement
 

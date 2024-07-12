@@ -4,11 +4,63 @@ from magpylib_force import getFT
 from scipy.spatial.transform import Rotation as R
 
 def inertia_tensor_cuboid_solid(mass, dimensions):
+    """calculates inertia tensor of cuboid with homogeneous mass density in coordinate system parallel to the edges
+
+    Parameters
+    ----------
+    mass: float or ndarray, shape (n,)
+        total mass of cuboid/s
+
+    dimensions: ndarray, shape (3,) or (n,3)
+        (x,y,z) dimensions of cuboid/s 
+    """
+
     dimensions_sq = dimensions**2
-    return mass/12 * np.array([[dimensions_sq[1]+dimensions_sq[2],0.,0.], [0.,dimensions_sq[0]+dimensions_sq[2],0.], [0.,0.,dimensions_sq[0]+dimensions_sq[1]]])
+    if np.isscalar(mass):
+        assert (len(dimensions) == 3) and (len(dimensions.shape) == 1), 'since "mass" is a scalar, "dimensions" must be an ndarray of length 3'
+        return mass/12 * np.array([[dimensions_sq[1]+dimensions_sq[2],0.,0.], [0.,dimensions_sq[0]+dimensions_sq[2],0.], [0.,0.,dimensions_sq[0]+dimensions_sq[1]]])
+    else:
+        assert (len(mass) == len(dimensions)) and (dimensions.shape[1] == 3), 'length of "mass" and "dimensions" must be the same and "dimensions" must have the shape (n,3)'
+        n = len(mass)
+        zero_entries = np.zeros(n*3)
+        # calculate the results as 1D vector, ready to be reshaped
+        result = np.concatenate(((dimensions_sq[:,1]+dimensions_sq[:,2]) * mass/12,
+                                 zero_entries,
+                                 (dimensions_sq[:,0]+dimensions_sq[:,2]) * mass/12,
+                                 zero_entries,
+                                 (dimensions_sq[:,0]+dimensions_sq[:,1]) * mass/12,
+                                 )) 
+        return result.reshape((n,3,3), order='F')
 
 def inertia_tensor_sphere_solid(mass, diameter):
-    return mass * diameter**2 / 10 * np.identity(3)
+    """calculates inertia tensor of sphere with homogeneous mass density
+
+    Parameters
+    ----------
+    mass: float or ndarray, shape (n,)
+        total mass of sphere/s
+
+    diameter: float or ndarray, shape (n,)
+        diameter/s of sphere/s
+    """
+
+    if np.isscalar(mass) and np.isscalar(diameter):
+        return mass * diameter**2 / 10 * np.identity(3)
+    elif len(mass) == len(diameter):
+        n = len(mass)
+        zero_entries = np.zeros(n*3)
+        matrix_entry = mass * diameter**2 / 10
+        # calculate the results as 1D vector, ready to be reshaped
+        result = np.concatenate((matrix_entry,
+                                 zero_entries,
+                                 matrix_entry,
+                                 zero_entries,
+                                 matrix_entry,
+                                 )) 
+        return result.reshape((n,3,3), order='F')
+
+    else:
+        raise ValueError('dimension mismatch, variables "mass" and "diameter" should have the same length')
 
 class Moving_system:
     def __init__(self, targets, sources, masses, inertia_tensors, velocities, angular_velocities):
@@ -87,6 +139,7 @@ class Moving_system:
         return p
 
 if __name__ == "__main__":
+
     # TARGETS: Magpylib target objects that move according to field
     dimension1 = np.array([2,1,1])
     dimension2 = np.array([2,1,1])
@@ -103,16 +156,11 @@ if __name__ == "__main__":
 
     moving_system = Moving_system([t1, t2], [], np.array([m1, m2]),  np.array([I1, I2]),  np.array([[0.,0.,0.], [0.,0.,0.]]),  np.array([[0.,0.,0.], [0.,0.,0.]]))
 
-    #moving_system.move(0.001)
 
-
-    for i in range(50):
+    for i in range(10):
         moving_system.move(0.001)
         p = moving_system.display()
-        #p.show()
-        p.off_screen = True
-        p.screenshot('tmp/{:04d}.png'.format(i))
+        p.show()
 
 
-    from make_gif import make_gif
-    make_gif("test", duration=50)
+
