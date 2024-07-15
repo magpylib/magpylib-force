@@ -122,6 +122,9 @@ class Moving_system:
             self.targets[i].position = self.targets[i].position + dt * self.velocities[i,:]
             self.targets[i].orientation = R.from_rotvec(dt*self.angular_velocities[i,:])*self.targets[i].orientation
 
+            print('magnet', i)
+            print('position after', self.targets[i].position)
+
 
     def display(self):
         FTs = self.get_force_torque()
@@ -145,9 +148,9 @@ if __name__ == "__main__":
     dimension1 = np.array([2,1,1])
     diameter2 = 1
     t1 = magpy.magnet.Cuboid(position=(-2,0,0), dimension=dimension1, polarization=(1,0,0), orientation=R.from_euler('y', -40, degrees=True))
-    t1.meshing = (5,5,5)
+    t1.meshing = (20,20,20)
     t2 = magpy.magnet.Sphere(position=(2,0,0), diameter=diameter2, polarization=(1,0,0), orientation=R.from_euler('y', 40, degrees=True))
-    t2.meshing = 5
+    t2.meshing = 20
 
 
     m1 = 1
@@ -159,10 +162,10 @@ if __name__ == "__main__":
     moving_system = Moving_system([t1, t2], [], np.array([m1, m2]),  np.array([I1, I2]),  np.array([[0.,0.,0.], [0.,0.,0.]]),  np.array([[0.,0.,0.], [0.,0.,0.]]))
 
 
-    for i in range(3):
+    for i in range(200):
         moving_system.move(0.001)
-        #p = moving_system.display()
-        #p.show()
+        # p = moving_system.display()
+        # p.show()
 
 
 
