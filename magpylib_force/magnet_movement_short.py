@@ -22,16 +22,22 @@ def apply_movement(targets, dt):
     """
     n_targets = len(targets)
 
+    # calculate force and torque
+    FTs = np.zeros((n_targets, 2, 3))
+    for i in range(n_targets):
+        # sources are all magnets instead of target
+        FTs[i,:,:] = getFT(targets[:i] + targets[i+1:], [targets[i]], anchor=None)
+
     # simulate movement
     for i in range(n_targets):
-        # calculate force and torque
-        FT = getFT(targets[:i] + targets[i+1:], [targets[i]], anchor=None)
         # calculate movement and rotation
-        targets[i].velocity = targets[i].velocity + dt/targets[i].mass * FT[0]
-        targets[i].angular_velocity = targets[i].angular_velocity + dt*targets[i].orientation.apply(np.dot(targets[i].inverse_inertia_tensor, targets[i].orientation.inv().apply(FT[1])))
+        targets[i].velocity = targets[i].velocity + dt/targets[i].mass * FTs[i,0,:]
+        targets[i].angular_velocity = targets[i].angular_velocity + dt*targets[i].orientation.apply(np.dot(targets[i].inverse_inertia_tensor, targets[i].orientation.inv().apply(FTs[i,1,:])))
         targets[i].position = targets[i].position + dt * targets[i].velocity
         targets[i].orientation = R.from_rotvec(dt*targets[i].angular_velocity)*targets[i].orientation
 
+        print('magnet', i)
+        print('position', targets[i].position)
 
 def display(targets):
 
@@ -63,7 +69,7 @@ def display(targets):
 if __name__ == "__main__":
 
     # TARGETS: Magpylib target objects that move according to field
-    t1 = magpy.magnet.Cuboid(position=(-2,0,0), dimension=np.array([1,1,1]), polarization=(1,0,0), orientation=R.from_euler('y', -40, degrees=True))
+    t1 = magpy.magnet.Cuboid(position=(-2,0,0), dimension=np.array([2,1,1]), polarization=(1,0,0), orientation=R.from_euler('y', -40, degrees=True))
     t1.meshing = (5,5,5)
     t1.mass = 1
     t1.inverse_inertia_tensor = inverse_inertia_tensor_cuboid_solid(t1.mass, t1.dimension)
@@ -76,10 +82,11 @@ if __name__ == "__main__":
     t2.velocity = np.array([0.,0.,0.])
     t2.angular_velocity = np.array([0.,0.,0.])
 
+
     targets = magpy.Collection(t1, t2)
     dt = 0.001
 
-    for i in range(20):
+    for i in range(3):
         apply_movement(targets, dt)
-        p = display(targets)
-        p.show()
+        #p = display(targets)
+        #p.show()

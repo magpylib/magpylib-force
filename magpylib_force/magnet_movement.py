@@ -117,9 +117,13 @@ class Moving_system:
         self.velocities = self.velocities + (dt/self.masses * FTs[:,0,:].T).T
         
         for i in range(self.n_targets):
+
             self.angular_velocities[i,:] = self.angular_velocities[i,:] + dt*self.targets[i].orientation.apply(np.dot(self.inverse_inertia_tensors[i,:,:], self.targets[i].orientation.inv().apply(FTs[i,1,:])))
             self.targets[i].position = self.targets[i].position + dt * self.velocities[i,:]
             self.targets[i].orientation = R.from_rotvec(dt*self.angular_velocities[i,:])*self.targets[i].orientation
+
+            print('magnet', i)
+            print('position after', self.targets[i].position)
 
 
     def display(self):
@@ -142,25 +146,26 @@ if __name__ == "__main__":
 
     # TARGETS: Magpylib target objects that move according to field
     dimension1 = np.array([2,1,1])
-    dimension2 = np.array([2,1,1])
+    diameter2 = 1
     t1 = magpy.magnet.Cuboid(position=(-2,0,0), dimension=dimension1, polarization=(1,0,0), orientation=R.from_euler('y', -40, degrees=True))
     t1.meshing = (5,5,5)
-    t2 = magpy.magnet.Cuboid(position=(2,0,0), dimension=dimension1, polarization=(1,0,0), orientation=R.from_euler('y', 40, degrees=True))
-    t2.meshing = (5,5,5)
+    t2 = magpy.magnet.Sphere(position=(2,0,0), diameter=diameter2, polarization=(1,0,0), orientation=R.from_euler('y', 40, degrees=True))
+    t2.meshing = 5
 
 
     m1 = 1
     m2 = 1
     I1 = inertia_tensor_cuboid_solid(m1, dimension1)
-    I2 = inertia_tensor_cuboid_solid(m2, dimension2)
+    I2 = inertia_tensor_sphere_solid(m2, diameter2)
+
 
     moving_system = Moving_system([t1, t2], [], np.array([m1, m2]),  np.array([I1, I2]),  np.array([[0.,0.,0.], [0.,0.,0.]]),  np.array([[0.,0.,0.], [0.,0.,0.]]))
 
 
-    for i in range(10):
+    for i in range(3):
         moving_system.move(0.001)
-        p = moving_system.display()
-        p.show()
+        #p = moving_system.display()
+        #p.show()
 
 
 
