@@ -36,8 +36,6 @@ def apply_movement(targets, dt):
         targets[i].position = targets[i].position + dt * targets[i].velocity
         targets[i].orientation = R.from_rotvec(dt*targets[i].angular_velocity)*targets[i].orientation
 
-        print('magnet', i)
-        print('position', targets[i].position)
 
 def display(targets):
 

@@ -122,9 +122,6 @@ class Moving_system:
             self.targets[i].position = self.targets[i].position + dt * self.velocities[i,:]
             self.targets[i].orientation = R.from_rotvec(dt*self.angular_velocities[i,:])*self.targets[i].orientation
 
-            print('magnet', i)
-            print('position after', self.targets[i].position)
-
 
     def display(self):
         FTs = self.get_force_torque()
