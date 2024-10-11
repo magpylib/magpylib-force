@@ -1,34 +1,40 @@
-import numpy as np
+"""
+Object Meshing codes
+"""
+
 import itertools
-import math as m
+from itertools import product
+
+import numpy as np
 from magpylib._src.obj_classes.class_magnet_Cuboid import Cuboid
 from magpylib._src.obj_classes.class_magnet_Sphere import Sphere
 from magpylib._src.obj_classes.class_magnet_Cylinder import Cylinder
 from magpylib._src.obj_classes.class_magnet_CylinderSegment import CylinderSegment
-from itertools import product
+
+#pylint: disable=too-many-locals
 
 
-def mesh_target(object):
+def mesh_target(obj):
     """
     create mesh for target objects
     """
-    if isinstance(object, Cuboid):
-        return mesh_cuboid(object)
-    elif isinstance(object, Sphere):
-        return mesh_sphere(object)
-    elif isinstance(object, Cylinder):
-        return mesh_cylinder(object)
-    elif isinstance(object, CylinderSegment):
-        return mesh_cylinder(object)
+    if isinstance(obj, Cuboid):
+        return mesh_cuboid(obj)
+    if isinstance(obj, Sphere):
+        return mesh_sphere(obj)
+    if isinstance(obj, Cylinder):
+        return mesh_cylinder(obj)
+    if isinstance(obj, CylinderSegment):
+        return mesh_cylinder(obj)
     raise RuntimeError("fktn `mesh_target`: should not be here!")
 
 
-def mesh_sphere(object):
+def mesh_sphere(obj):
     """
     create sphere mesh from object meshing parameter
     """
-    n = object.meshing
-    dia = object.diameter
+    n = obj.meshing
+    dia = obj.diameter
     a = -dia/2+dia/(2*n)
     b =  dia/2-dia/(2*n)
     c = n*1j
@@ -138,17 +144,19 @@ def cells_from_dimension(
     return np.array(result).astype(int)
 
 
-def mesh_cylinder(object):
+def mesh_cylinder(obj):
+    """
+    Mesh cylinder
+    """
+    n = obj.meshing
 
-    n = object.meshing
-
-    if isinstance(object, CylinderSegment):
-        r1, r2, h, phi1, phi2 = object.dimension
-    elif isinstance(object, Cylinder):
+    if isinstance(obj, CylinderSegment):
+        r1, r2, h, phi1, phi2 = obj.dimension
+    elif isinstance(obj, Cylinder):
         r1, r2, h, phi1, phi2 = (
             0,
-            object.dimension[0] / 2,
-            object.dimension[1],
+            obj.dimension[0] / 2,
+            obj.dimension[1],
             0,
             360,
         )
@@ -160,8 +168,6 @@ def mesh_cylinder(object):
     # "unroll" the cylinder and distribute the target number of elemens along the
     # circumference, radius and height.
     nphi, nr, nh = cells_from_dimension(dim, n)
-
-    elems = np.prod([nphi, nr, nh])
 
     r = np.linspace(r1, r2, nr + 1)
     dh = h / nh
@@ -190,18 +196,18 @@ def mesh_cylinder(object):
     return np.array(cells)
 
 
-def mesh_cuboid(object):
+def mesh_cuboid(obj):
     """
     splits cuboid into given mesh
     returns grid positions relative to cuboid position
     """
 
-    if np.isscalar(object.meshing):
-        n1,n2,n3 = cells_from_dimension(object.dimension, object.meshing)
+    if np.isscalar(obj.meshing):
+        n1,n2,n3 = cells_from_dimension(obj.dimension, obj.meshing)
     else:
-        n1,n2,n3 = object.meshing
+        n1,n2,n3 = obj.meshing
 
-    a,b,c = object.dimension
+    a,b,c = obj.dimension
     xs = np.linspace(-a/2, a/2, n1+1)
     ys = np.linspace(-b/2, b/2, n2+1)
     zs = np.linspace(-c/2, c/2, n3+1)

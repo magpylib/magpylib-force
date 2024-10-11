@@ -1,3 +1,7 @@
+"""
+Helper functions
+"""
+
 import warnings
 import numpy as np
 from magpylib._src.obj_classes.class_magnet_Cuboid import Cuboid
@@ -33,7 +37,8 @@ def check_input_targets(targets):
         if not isinstance(t, (Cuboid, Polyline, Sphere, Cylinder, CylinderSegment)):
             raise ValueError(
                 "Bad `targets` input for getFT."
-                " `targets` can only be Cuboids, Polylines, Spheres, Cylinders, and CylinderSegments."
+                " `targets` can only be Cuboids, Polylines, Spheres, Cylinders, and"
+                " CylinderSegments."
                 f" Instead receivd type {type(t)} target."
             )
         if not hasattr(t, "meshing"):
