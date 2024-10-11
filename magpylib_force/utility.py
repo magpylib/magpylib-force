@@ -4,6 +4,7 @@ from magpylib._src.obj_classes.class_magnet_Cuboid import Cuboid
 from magpylib._src.obj_classes.class_current_Polyline import Polyline
 from magpylib._src.obj_classes.class_magnet_Sphere import Sphere
 from magpylib._src.obj_classes.class_magnet_Cylinder import Cylinder
+from magpylib._src.obj_classes.class_magnet_CylinderSegment import CylinderSegment
 
 def check_input_anchor(anchor):
     """
@@ -29,10 +30,10 @@ def check_input_targets(targets):
     if not isinstance(targets, list):
         targets = [targets]
     for t in targets:
-        if not isinstance(t, (Cuboid, Polyline, Sphere, Cylinder)):
+        if not isinstance(t, (Cuboid, Polyline, Sphere, Cylinder, CylinderSegment)):
             raise ValueError(
                 "Bad `targets` input for getFT."
-                " `targets` can only be Cuboids, Polylines, Spheres, and Cylinders."
+                " `targets` can only be Cuboids, Polylines, Spheres, Cylinders, and CylinderSegments."
                 f" Instead receivd type {type(t)} target."
             )
         if not hasattr(t, "meshing"):
@@ -41,20 +42,3 @@ def check_input_targets(targets):
                 " `targets` must have the `meshing` parameter set."
             )
     return targets
-
-# def check_input_targets_Cuboid(targets):
-#     """ check and format targets input """
-#     if isinstance(targets, Cuboid):
-#         targets = [targets]
-#     if not isinstance(targets, list):
-#         raise ValueError("Bad targets input.")
-#     return targets
-
-
-# def check_input_targets_Polyline(targets):
-#     """ check and format targets input """
-#     if isinstance(targets, Polyline):
-#         targets = [targets]
-#     if not isinstance(targets, list):
-#         raise ValueError("Bad targets input.")
-#     return targets

@@ -193,3 +193,34 @@ def test_consistency_cylinder_polyline():
     ft2 = getFT(loop, cyl, anchor=cyl.position)
 
     assert np.max(abs((ft1+ft2)/(ft1-ft2))) < 1e-2
+
+
+def test_consistency_cylinder_segment_cuboid():
+    """
+    check backward-forward with CylinderSegment and Cuboid
+    """
+    cube = magpy.magnet.Cuboid(
+    dimension=(1,1,2),
+    polarization=(-1,-2,-1)
+    )
+    cube.meshing=(20,20,10)
+
+    dims = [
+        (2,3,1,-20,120),
+        (2,4,2,10,50),
+        (3,4,3,50,100)
+    ]
+    pols = [
+        (3,2,1),
+        (1,2,3),
+        (0,0,1),
+    ]
+    for dim,pol in zip(dims,pols):
+        cyls = magpy.magnet.CylinderSegment(dimension=dim, polarization=pol)
+        cyls.rotate_from_angax(-45, (1,1,1))
+        cyls.meshing=100
+        cyls.show(cube)
+        ft1 = getFT(cyls, cube, anchor=(0,0,0))
+        ft2 = getFT(cube, cyls, anchor=(0,0,0))
+
+        assert np.amax(abs((ft1+ft2)/(ft1-ft2))) < 0.01
