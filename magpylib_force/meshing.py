@@ -3,6 +3,7 @@ import itertools
 import math as m
 from magpylib._src.obj_classes.class_magnet_Cuboid import Cuboid
 from magpylib._src.obj_classes.class_magnet_Sphere import Sphere
+from magpylib._src.obj_classes.class_magnet_Cylinder import Cylinder
 
 def mesh_target(object):
     """
@@ -12,6 +13,8 @@ def mesh_target(object):
         return mesh_cuboid(object)
     elif isinstance(object, Sphere):
         return mesh_sphere(object)
+    elif isinstance(object, Cylinder):
+        return mesh_cylinder(object)
     raise RuntimeError("fktn `mesh_target`: should not be here!")
 
 
@@ -26,6 +29,44 @@ def mesh_sphere(object):
     c = n*1j
     mesh = np.mgrid[a:b:c, a:b:c, a:b:c].T.reshape(n**3,3)
     return mesh[np.linalg.norm(mesh, axis=1)<dia/2]
+
+
+def mesh_cylinder(object):
+    """
+    create cylinder mesh from object meshing parameter
+    """
+    n = object.meshing
+    dia, height = object.dimension
+
+    a1 = -dia/2+dia/(2*n)
+    b1 =  dia/2-dia/(2*n)
+    a2 = -height/2+height/(2*n)
+    b2 =  height/2-height/(2*n)
+    
+    if dia > height:
+        c1 = n
+        c2 = int(n/dia*height)
+        if c2<3:
+            print("Warning: bad cylinder mesh ratio. Increase meshing parameter.")
+            c2 = 3
+    else:
+        c2 = n
+        c1 = int(n/height*dia)
+        if c1<3:
+            print("Warning: bad cylinder mesh ratio. Increase meshing parameter.")
+            c1 = 3
+
+    mesh = np.mgrid[a1:b1:c1*1j, a1:b1:c1*1j, a2:b2:c2*1j].T.reshape(c1*c1*c2,3)
+    mask = np.linalg.norm(mesh[:,:2], axis=1) < dia/2
+    return mesh[mask]
+
+    # import matplotlib.pyplot as plt
+    # fig = plt.figure()
+    # ax = fig.add_subplot(121, projection='3d')
+    # mesh = mesh[mask]
+    # ax.plot(mesh[:,0], mesh[:,1], mesh[:,2], ls='', marker='.')
+    # plt.show()
+    #return mesh[np.linalg.norm(mesh, axis=1)<dia/2]
 
 
 def mesh_cuboid(object):
@@ -54,94 +95,92 @@ def mesh_cuboid(object):
     return np.array(list(itertools.product(xs_cent, ys_cent, zs_cent)))
 
 
+# def mesh_cuboid_old2(object, verbose=False):
+#     """
+#     Splits up the object volume into a regular grid of small rectangular cells.
+#     The returned grid points lie in the center of these cells.
 
+#     Parameters
+#     ----------
+#     object: Magpylib source object with cuboid geometry
+#         Must have the parameter `dimension` with shape (3,).
+#         Must have the parameter `mesh` which is an int n or a triplet (n1,n2,n3).
+#         If mesh is int n, the cells are created aiming to achieve cubic aspect
+#         ratios. The resulting number of cells lies close to n. If input is
+#         triplet (n1,n2,n3), the mesh is created with those splittings.
+#     verbose: bool, default=False
+#         Print resulting mesh parameters
 
-def mesh_cuboid_old2(object, verbose=False):
-    """
-    Splits up the object volume into a regular grid of small rectangular cells.
-    The returned grid points lie in the center of these cells.
+#     Returns
+#     -------
+#     grid positions: np.ndarray shape (m,3)
+#     """
+#     a,b,c = object.dimension
+#     splitting = object.meshing
+#     if isinstance(splitting, (float, int)):
+#         x = (a*b*c/splitting)**(1/3)
+#         n1 = m.ceil(a/x)
+#         n2 = m.ceil(b/x)
+#         n3 = m.ceil(c/x)
+#     else:
+#         n1,n2,n3 = np.array(splitting)+1
+#     xs = np.linspace(-a/2, a/2, n1)
+#     ys = np.linspace(-b/2, b/2, n2)
+#     zs = np.linspace(-c/2, c/2, n3)
 
-    Parameters
-    ----------
-    object: Magpylib source object with cuboid geometry
-        Must have the parameter `dimension` with shape (3,).
-        Must have the parameter `mesh` which is an int n or a triplet (n1,n2,n3).
-        If mesh is int n, the cells are created aiming to achieve cubic aspect
-        ratios. The resulting number of cells lies close to n. If input is
-        triplet (n1,n2,n3), the mesh is created with those splittings.
-    verbose: bool, default=False
-        Print resulting mesh parameters
+#     dx = xs[1] - xs[0] if len(xs)>1 else a
+#     dy = ys[1] - ys[0] if len(ys)>1 else b
+#     dz = zs[1] - zs[0] if len(zs)>1 else c
 
-    Returns
-    -------
-    grid positions: np.ndarray shape (m,3)
-    """
-    a,b,c = object.dimension
-    splitting = object.meshing
-    if isinstance(splitting, (float, int)):
-        x = (a*b*c/splitting)**(1/3)
-        n1 = m.ceil(a/x)
-        n2 = m.ceil(b/x)
-        n3 = m.ceil(c/x)
-    else:
-        n1,n2,n3 = np.array(splitting)+1
-    xs = np.linspace(-a/2, a/2, n1)
-    ys = np.linspace(-b/2, b/2, n2)
-    zs = np.linspace(-c/2, c/2, n3)
+#     xs_cent = xs[:-1] + dx/2 if len(xs)>1 else xs + dx/2
+#     ys_cent = ys[:-1] + dy/2 if len(ys)>1 else ys + dy/2
+#     zs_cent = zs[:-1] + dz/2 if len(zs)>1 else zs + dz/2
 
-    dx = xs[1] - xs[0] if len(xs)>1 else a
-    dy = ys[1] - ys[0] if len(ys)>1 else b
-    dz = zs[1] - zs[0] if len(zs)>1 else c
+#     permutas = np.array(list(itertools.product(xs_cent, ys_cent, zs_cent)))
 
-    xs_cent = xs[:-1] + dx/2 if len(xs)>1 else xs + dx/2
-    ys_cent = ys[:-1] + dy/2 if len(ys)>1 else ys + dy/2
-    zs_cent = zs[:-1] + dz/2 if len(zs)>1 else zs + dz/2
+#     if verbose:
+#         print('####### mesh statistics #######')
+#         print(f'- No. cells: {(n1-1)*(n2-1)*(n3-1)}')
+#         print(f'- Splitting: {n1-1} x {n2-1} x {n3-1}')
+#         print(f'- Cell dim : {np.round(dx, 4)} x {np.round(dy, 4)} x {np.round(dz, 4)}')
 
-    permutas = np.array(list(itertools.product(xs_cent, ys_cent, zs_cent)))
+#     offset = object.position
+#     rotation = object.orientation
 
-    if verbose:
-        print('####### mesh statistics #######')
-        print(f'- No. cells: {(n1-1)*(n2-1)*(n3-1)}')
-        print(f'- Splitting: {n1-1} x {n2-1} x {n3-1}')
-        print(f'- Cell dim : {np.round(dx, 4)} x {np.round(dy, 4)} x {np.round(dz, 4)}')
-
-    offset = object.position
-    rotation = object.orientation
-
-    return rotation.apply(permutas) + offset
+#     return rotation.apply(permutas) + offset
 
 
 
 
-def cuboid_data(center, size):
-    """
-    Create a data array for cuboid plotting.
-    ============= ================================================
-    Argument      Description
-    ============= ================================================
-    center        center of the cuboid, triple
-    size          size of the cuboid, triple, (x_length,y_width,z_height)
-    :type size: tuple, numpy.array, list
-    :param size: size of the cuboid, triple, (x_length,y_width,z_height)
-    :type center: tuple, numpy.array, list
-    :param center: center of the cuboid, triple, (x,y,z)
-    """
+# def cuboid_data(center, size):
+#     """
+#     Create a data array for cuboid plotting.
+#     ============= ================================================
+#     Argument      Description
+#     ============= ================================================
+#     center        center of the cuboid, triple
+#     size          size of the cuboid, triple, (x_length,y_width,z_height)
+#     :type size: tuple, numpy.array, list
+#     :param size: size of the cuboid, triple, (x_length,y_width,z_height)
+#     :type center: tuple, numpy.array, list
+#     :param center: center of the cuboid, triple, (x,y,z)
+#     """
 
-    # suppose axis direction: x: to left; y: to inside; z: to upper
-    # get the (left, outside, bottom) point
-    o = [a - b / 2 for a, b in zip(center, size)]
-    # get the length, width, and height
-    l, w, h = size
-    x = [[o[0], o[0] + l, o[0] + l, o[0], o[0]],  # x coordinate of points in bottom surface
-         [o[0], o[0] + l, o[0] + l, o[0], o[0]],  # x coordinate of points in upper surface
-         [o[0], o[0] + l, o[0] + l, o[0], o[0]],  # x coordinate of points in outside surface
-         [o[0], o[0] + l, o[0] + l, o[0], o[0]]]  # x coordinate of points in inside surface
-    y = [[o[1], o[1], o[1] + w, o[1] + w, o[1]],  # y coordinate of points in bottom surface
-         [o[1], o[1], o[1] + w, o[1] + w, o[1]],  # y coordinate of points in upper surface
-         [o[1], o[1], o[1], o[1], o[1]],          # y coordinate of points in outside surface
-         [o[1] + w, o[1] + w, o[1] + w, o[1] + w, o[1] + w]]    # y coordinate of points in inside surface
-    z = [[o[2], o[2], o[2], o[2], o[2]],                        # z coordinate of points in bottom surface
-         [o[2] + h, o[2] + h, o[2] + h, o[2] + h, o[2] + h],    # z coordinate of points in upper surface
-         [o[2], o[2], o[2] + h, o[2] + h, o[2]],                # z coordinate of points in outside surface
-         [o[2], o[2], o[2] + h, o[2] + h, o[2]]]                # z coordinate of points in inside surface
-    return x, y, z
+#     # suppose axis direction: x: to left; y: to inside; z: to upper
+#     # get the (left, outside, bottom) point
+#     o = [a - b / 2 for a, b in zip(center, size)]
+#     # get the length, width, and height
+#     l, w, h = size
+#     x = [[o[0], o[0] + l, o[0] + l, o[0], o[0]],  # x coordinate of points in bottom surface
+#          [o[0], o[0] + l, o[0] + l, o[0], o[0]],  # x coordinate of points in upper surface
+#          [o[0], o[0] + l, o[0] + l, o[0], o[0]],  # x coordinate of points in outside surface
+#          [o[0], o[0] + l, o[0] + l, o[0], o[0]]]  # x coordinate of points in inside surface
+#     y = [[o[1], o[1], o[1] + w, o[1] + w, o[1]],  # y coordinate of points in bottom surface
+#          [o[1], o[1], o[1] + w, o[1] + w, o[1]],  # y coordinate of points in upper surface
+#          [o[1], o[1], o[1], o[1], o[1]],          # y coordinate of points in outside surface
+#          [o[1] + w, o[1] + w, o[1] + w, o[1] + w, o[1] + w]]    # y coordinate of points in inside surface
+#     z = [[o[2], o[2], o[2], o[2], o[2]],                        # z coordinate of points in bottom surface
+#          [o[2] + h, o[2] + h, o[2] + h, o[2] + h, o[2] + h],    # z coordinate of points in upper surface
+#          [o[2], o[2], o[2] + h, o[2] + h, o[2]],                # z coordinate of points in outside surface
+#          [o[2], o[2], o[2] + h, o[2] + h, o[2]]]                # z coordinate of points in inside surface
+#     return x, y, z

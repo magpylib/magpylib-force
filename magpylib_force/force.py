@@ -7,6 +7,7 @@ from magpylib_force.utility import check_input_targets
 from magpylib._src.obj_classes.class_current_Polyline import Polyline
 from magpylib._src.obj_classes.class_magnet_Cuboid import Cuboid
 from magpylib._src.obj_classes.class_magnet_Sphere import Sphere
+from magpylib._src.obj_classes.class_magnet_Cylinder import Cylinder
 
 
 def getFT(sources, targets, anchor=None, eps=1e-5, squeeze=True):
@@ -51,8 +52,8 @@ def getFT(sources, targets, anchor=None, eps=1e-5, squeeze=True):
     n = len(targets)
 
     # split targets into lists of similar types
-    TARGET_TYPES = [Cuboid, Polyline, Sphere]
-    getFT_FUNCS = [getFTmagnet, getFTcurrent, getFTmagnet]
+    TARGET_TYPES = [Cuboid, Polyline, Sphere, Cylinder]
+    getFT_FUNCS = [getFTmagnet, getFTcurrent, getFTmagnet, getFTmagnet]
     objects = [[] for _ in TARGET_TYPES]
     orders  = [[] for _ in TARGET_TYPES]
 
@@ -78,20 +79,6 @@ def getFT(sources, targets, anchor=None, eps=1e-5, squeeze=True):
     return FT
 
 
-def mesh_instances(targets):
-    """
-    utility for getFTmagnet: compute number of mesh instances for each target magnet
-    targets: list of target magnet objects
-    returns: int
-    """
-    if isinstance(targets[0], Cuboid):
-        return np.array([np.prod(tgt.meshing) for tgt in targets])
-    elif isinstance(targets[0], Sphere):
-        SPH_MESH = (0,1,8,19,32,81,136,179,280,389,552,739,912,1189,1472,1791,2176,2553,3112,3695,4224)
-        return np.array([SPH_MESH[tgt.meshing] for tgt in targets])
-    raise RuntimeError("fktn `mesh_instances` - I shouldt be here.")
-
-
 def volume(target):
     """
     utility for getFTmagnet: compute physical volume of target magnets
@@ -102,6 +89,9 @@ def volume(target):
         return np.prod(target.dimension)
     elif isinstance(target, Sphere):
         return target.diameter**3 * np.pi / 6
+    elif isinstance(target, Cylinder):
+        d, h = target.dimension
+        return d**2 * np.pi * h / 4
     raise RuntimeError("fktn `volume` - I shouldt be here.")
 
 
@@ -132,8 +122,11 @@ def getFTmagnet(sources, targets, eps=1e-5, anchor=None):
     # number of magnets
     tgt_number = len(targets)
 
+    # create meshes
+    meshes = [mesh_target(tgt) for tgt in targets]
+
     # number of instances of each magnet
-    inst_numbers = mesh_instances(targets)
+    inst_numbers = [len(mesh) for mesh in meshes]
 
     # total number of instances
     no_inst = np.sum(inst_numbers)
@@ -155,7 +148,8 @@ def getFTmagnet(sources, targets, eps=1e-5, anchor=None):
         inst_mom = tgt.orientation.apply(tgt.magnetization) * tgt_vol / inst_numbers[i]
         MOM[insti[i]:insti[i+1]] = inst_mom
 
-        mesh = mesh_target(tgt)
+        mesh = meshes[i]
+        #mesh_target(tgt)
         #import matplotlib.pyplot as plt
         #ax = plt.figure().add_subplot(projection='3d')
         #ax.plot(mesh[:,0], mesh[:,1], mesh[:,2], ls='', marker='.')

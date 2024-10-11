@@ -169,3 +169,24 @@ def test_consistency_cube_loop():
     assert errFb < 1e-5
     errTb = np.linalg.norm(T1b+T2b) / np.linalg.norm(T1b-T2b)*2
     assert errTb < 1e-5
+
+
+def test_consistency_cylinder_polyline():
+    """
+    check backward and forward for cylinder and polyline
+    """
+    loop = magpy.current.Polyline(
+    vertices=((-3,0,0), (0,-3,0), (3,0,0), (0,3,0), (-3,0,0)),
+    current=1000,
+    position=(0,0,-1),
+    )
+    loop.rotate_from_angax(-45, (1,1,1))
+    loop.meshing=100
+
+    cyl = magpy.magnet.Cylinder(dimension=(2,1), polarization=(1,2,3))
+    cyl.meshing=20
+
+    ft1 = getFT(cyl, loop, anchor=cyl.position)
+    ft2 = getFT(loop, cyl, anchor=cyl.position)
+
+    assert np.max(abs((ft1+ft2)/(ft1-ft2))) < 1e-2
