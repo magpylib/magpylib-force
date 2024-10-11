@@ -1,3 +1,9 @@
+# v0.2.0 (2024/10/11)
+- Added a warning when no anchor is given to getFT to avoid misuse.
+- Added Cylinder computation
+- Added Cylinder Segment computation
+- improved internals (there is still a lot of room)
+
 # v0.1.10
 - improve docstrings
 - fix bad sign of torque
