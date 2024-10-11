@@ -1,3 +1,4 @@
+import warnings
 import numpy as np
 import magpylib as magpy
 from magpylib_force.force import getFT
@@ -105,8 +106,10 @@ def test_consistency_loop_loop():
         vertices=[(-1,-1,.5), (-1,1,1), (1,1,2), (1,-1,1), (-1,-1,.5)],
     )
     wire2.meshing=(200)
-    F1a,_ = getFT(wire1, wire2)
-    F2a,_ = getFT(wire2, wire1)
+    with warnings.catch_warnings():
+        warnings.simplefilter('ignore')
+        F1a,_ = getFT(wire1, wire2)
+        F2a,_ = getFT(wire2, wire1)
     errFa = np.linalg.norm(F1a+F2a) / np.linalg.norm(F1a-F2a)
     assert errFa < 1e-5
 

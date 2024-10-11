@@ -1,3 +1,4 @@
+import warnings
 import numpy as np
 from magpylib._src.obj_classes.class_magnet_Cuboid import Cuboid
 from magpylib._src.obj_classes.class_current_Polyline import Polyline
@@ -9,6 +10,10 @@ def check_input_anchor(anchor):
     check and format anchor input
     """
     if anchor is None:
+        warnings.warn(
+            "No anchor was handed to getFT. This results in incorrect "
+            "torque computation by excluding force contribution to torque."
+            )
         return None
     if isinstance(anchor, (list, tuple)):
         anchor = np.array(anchor)

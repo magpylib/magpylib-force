@@ -1,3 +1,4 @@
+import warnings
 import numpy as np
 import magpylib as magpy
 from magpylib_force.force import getFT
@@ -34,7 +35,9 @@ def test_ANSYS_cube_cube():
 
     for i,poz in enumerate(tgt_pos):
         tgt.position = poz
-        F,T = getFT(gen, tgt)
+        with warnings.catch_warnings():
+            warnings.simplefilter('ignore')
+            F,T = getFT(gen, tgt)
         T *= -1 #bad sign in original implementation
 
         errF = np.linalg.norm(F - F_fe[i])/np.linalg.norm(F)
@@ -86,7 +89,9 @@ def test_ANSYS_loop_loop():
         F2 = d[6:9]
 
         # analytical force
-        F3,_ = getFT(sources=cloop, targets=sloop)
+        with warnings.catch_warnings():
+            warnings.simplefilter('ignore')
+            F3,_ = getFT(sources=cloop, targets=sloop)
         F3 *= 1e6
 
         err = np.linalg.norm(F2-F3)/np.linalg.norm(F3)
