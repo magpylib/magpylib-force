@@ -13,6 +13,12 @@ This work is supported by a NUMFOCUS grant: SDG 2024 round 1
 
 `pip install magpylib-force`
 
+# Documentation and Examples
+
+The [API documentation](https://magpylib.readthedocs.io/en/latest/_pages/user_guide/docs/docs_magpylib_force.html) is integrated into the Magpylib docs.
+
+Some [examples](https://magpylib.readthedocs.io/en/latest/_pages/user_guide/examples/examples_index.html) are also part of the Magpylib webpage.
+
 # Example code:
 
 ```python
