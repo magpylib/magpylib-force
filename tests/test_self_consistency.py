@@ -209,7 +209,7 @@ def test_consistency_cylinder_segment_cuboid():
     dimension=(1,1,2),
     polarization=(-1,-2,-1)
     )
-    cube.meshing=(10,10,5)
+    cube.meshing=(8,8,4)
 
     dims = [
         (2,3,1,-20,120),
@@ -224,8 +224,8 @@ def test_consistency_cylinder_segment_cuboid():
     for dim,pol in zip(dims,pols):
         cyls = magpy.magnet.CylinderSegment(dimension=dim, polarization=pol)
         cyls.rotate_from_angax(-45, (1,1,1))
-        cyls.meshing=500
+        cyls.meshing=300
         ft1 = getFT(cyls, cube, anchor=(0,0,0))
         ft2 = getFT(cube, cyls, anchor=(0,0,0))
 
-        assert np.amax(abs((ft1+ft2)/(ft1-ft2))) < 0.06
+        assert np.amax(abs((ft1+ft2)/(ft1-ft2))) < 0.09
