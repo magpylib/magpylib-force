@@ -43,7 +43,7 @@ def mesh_cylinder(object):
     b1 =  dia/2-dia/(2*n)
     a2 = -height/2+height/(2*n)
     b2 =  height/2-height/(2*n)
-    
+
     if dia > height:
         c1 = n
         c2 = int(n/dia*height)
@@ -73,7 +73,7 @@ def mesh_cylinder_segment(object):
     b1 =  r2-r2/n
     a2 = -h/2 + h/(2*n)
     b2 =  h/2 - h/(2*n)
-    
+
     dia = 2*r2
     if dia > h:
         c1 = n
@@ -86,7 +86,7 @@ def mesh_cylinder_segment(object):
 
     mesh = np.mgrid[a1:b1:c1*1j, a1:b1:c1*1j, a2:b2:c2*1j].T.reshape(c1*c1*c2,3)
     import magpylib as magpy
-    
+
     mask1 = np.linalg.norm(mesh[:,:2], axis=1) > r1
     mask2 = np.linalg.norm(mesh[:,:2], axis=1) < r2
     mask3 = np.arctan2(mesh[:,0], mesh[:,1]) > phi1/180*np.pi
