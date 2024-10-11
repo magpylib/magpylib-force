@@ -139,7 +139,7 @@ def cells_from_dimension(
 def mesh_cylinder(object):
 
     n = object.meshing
-    
+
     if isinstance(object, CylinderSegment):
         r1, r2, h, phi1, phi2 = object.dimension
     elif isinstance(object, Cylinder):
@@ -186,9 +186,9 @@ def mesh_cylinder(object):
                     )
                     radial_coord = (r[r_ind] + r[r_ind + 1]) / 2
                     angle_coord = (phi[phi_ind] + phi[phi_ind + 1]) / 2
-                    
-                    cell = (radial_coord * np.cos(np.deg2rad(angle_coord)), 
-                            radial_coord * np.sin(np.deg2rad(angle_coord)), 
+
+                    cell = (radial_coord * np.cos(np.deg2rad(angle_coord)),
+                            radial_coord * np.sin(np.deg2rad(angle_coord)),
                             pos_h)
                     cells.append(cell)
     #return _collection_from_obj_and_cells(cylinder, cells, **kwargs)
