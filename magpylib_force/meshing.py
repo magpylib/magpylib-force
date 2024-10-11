@@ -195,8 +195,13 @@ def mesh_cuboid(object):
     splits cuboid into given mesh
     returns grid positions relative to cuboid position
     """
+
+    if np.isscalar(object.meshing):
+        n1,n2,n3 = cells_from_dimension(object.dimension, object.meshing)
+    else:
+        n1,n2,n3 = object.meshing
+
     a,b,c = object.dimension
-    n1,n2,n3 = object.meshing
     xs = np.linspace(-a/2, a/2, n1+1)
     ys = np.linspace(-b/2, b/2, n2+1)
     zs = np.linspace(-c/2, c/2, n3+1)
