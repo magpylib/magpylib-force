@@ -1,3 +1,4 @@
+import warnings
 import numpy as np
 import magpylib as magpy
 from magpylib_force.force import getFT
@@ -78,7 +79,9 @@ def test_physics_loop_torque():
     hom = magpy.misc.CustomSource(field_func=func)
 
     # without anchor
-    F,T = getFT(hom, cloop, anchor=None)
+    with warnings.catch_warnings():
+        warnings.simplefilter('ignore')
+        F,T = getFT(hom, cloop, anchor=None)
     assert np.amax(abs(F)) < 1e-14
     assert np.amax(abs(T)) == 0
 
@@ -101,7 +104,9 @@ def test_physics_loop_torque():
     rloop.meshing = 10
 
     # without anchor
-    F,T = getFT(hom, rloop, anchor=None)
+    with warnings.catch_warnings():
+        warnings.simplefilter('ignore')
+        F,T = getFT(hom, rloop, anchor=None)
     assert np.amax(abs(F)) < 1e-14
     assert np.amax(abs(T)) == 0
 
@@ -150,7 +155,9 @@ def test_physics_parallel_wires():
     wire2 = wire1.copy(position=(0,0,1))
     wire2.meshing = 1000
 
-    F,_ = getFT(wire1, wire2)
+    with warnings.catch_warnings():
+        warnings.simplefilter('ignore')
+        F,_ = getFT(wire1, wire2)
 
     Fanalytic = 2*magpy.mu_0/4/np.pi*2000
 
@@ -196,7 +203,9 @@ def test_physics_perpendicular_wires():
     )
     wire2.meshing = 1000
 
-    F,T = getFT(wire1, wire2)
+    with warnings.catch_warnings():
+        warnings.simplefilter('ignore')
+        F,_ = getFT(wire1, wire2)
 
     assert np.max(abs(F)) < 1e-14
 
@@ -276,7 +285,9 @@ def test_torque_sign():
     mag1.rotate_from_angax(15, "y")
     mag1.meshing=(3,3,3)
 
-    _,T = getFT(mag2, mag1)
+    with warnings.catch_warnings():
+        warnings.simplefilter('ignore')
+        _,T = getFT(mag2, mag1)
 
     assert T[1] < 0
 

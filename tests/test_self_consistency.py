@@ -1,3 +1,4 @@
+import warnings
 import numpy as np
 import magpylib as magpy
 from magpylib_force.force import getFT
@@ -105,8 +106,10 @@ def test_consistency_loop_loop():
         vertices=[(-1,-1,.5), (-1,1,1), (1,1,2), (1,-1,1), (-1,-1,.5)],
     )
     wire2.meshing=(200)
-    F1a,_ = getFT(wire1, wire2)
-    F2a,_ = getFT(wire2, wire1)
+    with warnings.catch_warnings():
+        warnings.simplefilter('ignore')
+        F1a,_ = getFT(wire1, wire2)
+        F2a,_ = getFT(wire2, wire1)
     errFa = np.linalg.norm(F1a+F2a) / np.linalg.norm(F1a-F2a)
     assert errFa < 1e-5
 
@@ -169,3 +172,60 @@ def test_consistency_cube_loop():
     assert errFb < 1e-5
     errTb = np.linalg.norm(T1b+T2b) / np.linalg.norm(T1b-T2b)*2
     assert errTb < 1e-5
+
+
+def test_consistency_cylinder_polyline():
+    """
+    check backward and forward for cylinder and polyline
+    """
+    loop = magpy.current.Polyline(
+    vertices=((-3,0,0), (0,-3,0), (3,0,0), (0,3,0), (-3,0,0)),
+    current=1000,
+    position=(0,0,-1),
+    )
+    loop.rotate_from_angax(-45, (1,1,1))
+    loop.meshing=100
+
+    cyl = magpy.magnet.Cylinder(dimension=(2,1), polarization=(1,2,3))
+    cyl.meshing=200
+
+    ft1 = getFT(cyl, loop, anchor=cyl.position)
+    ft2 = getFT(loop, cyl, anchor=cyl.position)
+
+    assert np.max(abs((ft1+ft2)/(ft1-ft2))) < 0.001
+
+    cyl.rotate_from_angax(33, (1,2,3))
+
+    ft1 = getFT(cyl, loop, anchor=cyl.position)
+    ft2 = getFT(loop, cyl, anchor=cyl.position)
+    assert np.max(abs((ft1+ft2)/(ft1-ft2))) < 0.001
+
+
+def test_consistency_cylinder_segment_cuboid():
+    """
+    check backward-forward with CylinderSegment and Cuboid
+    """
+    cube = magpy.magnet.Cuboid(
+    dimension=(1,1,2),
+    polarization=(-1,-2,-1)
+    )
+    cube.meshing=(8,8,4)
+
+    dims = [
+        (2,3,1,-20,120),
+        (2,4,2,10,50),
+        (3,4,3,50,100)
+    ]
+    pols = [
+        (3,2,1),
+        (1,2,3),
+        (0,0,1),
+    ]
+    for dim,pol in zip(dims,pols):
+        cyls = magpy.magnet.CylinderSegment(dimension=dim, polarization=pol)
+        cyls.rotate_from_angax(-45, (1,1,1))
+        cyls.meshing=300
+        ft1 = getFT(cyls, cube, anchor=(0,0,0))
+        ft2 = getFT(cube, cyls, anchor=(0,0,0))
+
+        assert np.amax(abs((ft1+ft2)/(ft1-ft2))) < 0.09
