@@ -2,6 +2,8 @@ import warnings
 import numpy as np
 import magpylib as magpy
 from magpylib_force.force import getFT
+from scipy.special import ellipe
+from scipy.special import ellipk
 
 
 # def test_physics_loop_torque():
@@ -304,3 +306,29 @@ def test_torque_sign():
     _,T = getFT(mag, loop, anchor=(0,0,0))
 
     assert T[1] < 0
+
+
+def test_force_between_cocentric_loops():
+    """
+    compare the numerical solution against the analytical solution of the force between two
+    cocentric current loops.
+    See e.g. IEEE TRANSACTIONS ON MAGNETICS, VOL. 49, NO. 8, AUGUST 2013
+    """
+    z1, z2 = 0.123, 1.321
+    i1, i2 = 3.2, 5.1
+    r1, r2 = 1.2, 2.3
+
+    # numerical solution
+    loop1 = magpy.current.Circle(diameter=2*r1, current=i1, position=(0,0,z1))
+    loop2 = magpy.current.Circle(diameter=2*r2, current=i2, position=(0,0,z2))
+    loop2.meshing=1000
+    F_num = getFT(loop1, loop2, anchor=(0,0,0))[0,2]
+    
+    # analytical solution
+    k2 = 4*r1*r2 / ((r1+r2)**2+(z1-z2)**2)
+    k = np.sqrt(k2)
+    pf = magpy.mu_0*i1*i2*(z1-z2)*k / 4 / np.sqrt(r1*r2)
+    F_ana = pf*( (2-k2)/(1-k2)*ellipe(k**2) - 2*ellipk(k**2) )
+
+    assert abs((F_num - F_ana)/(F_num + F_ana)) < 1e-5
+        

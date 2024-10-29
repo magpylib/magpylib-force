@@ -229,3 +229,41 @@ def test_consistency_cylinder_segment_cuboid():
         ft2 = getFT(cube, cyls, anchor=(0,0,0))
 
         assert np.amax(abs((ft1+ft2)/(ft1-ft2))) < 0.09
+
+
+def test_consistency_polyline_circle():
+    """
+    compare Polyline solution to circle solution
+    """
+
+    src = magpy.magnet.Sphere(diameter=1, polarization=(1,2,3), position=(0,0,-1))
+    
+    # circle
+    loop1 = magpy.current.Circle(diameter=3, current=123)
+    loop1.meshing=500
+    # polyline
+    rr = loop1.diameter/2
+    ii = loop1.current
+    phis = np.linspace(0,2*np.pi,500)
+    verts = [(rr*np.cos(p), rr*np.sin(p), 0) for p in phis]
+    loop2 = magpy.current.Polyline(current=ii, vertices=verts)
+    loop2.meshing=1
+    
+    F1,T1 = getFT(src, loop1, anchor=(0,0,0))
+    F2,T2 = getFT(src, loop2, anchor=(0,0,0))
+    assert abs(np.linalg.norm(F1-F2)/np.linalg.norm(F1+F2)) < 1e-7
+    assert abs(np.linalg.norm(T1-T2)/np.linalg.norm(T1+T2)) < 1e-7
+
+    loop1.move((1.123,2.321,.123))
+    loop2.move((1.123,2.321,.123))
+    F1,T1 = getFT(src, loop1, anchor=(0,0,0))
+    F2,T2 = getFT(src, loop2, anchor=(0,0,0))
+    assert abs(np.linalg.norm(F1-F2)/np.linalg.norm(F1+F2)) < 1e-7
+    assert abs(np.linalg.norm(T1-T2)/np.linalg.norm(T1+T2)) < 1e-7
+
+    loop1.rotate_from_angax(20, 'x')
+    loop2.rotate_from_angax(20, 'x')
+    F1,T1 = getFT(src, loop1, anchor=(0,0,0))
+    F2,T2 = getFT(src, loop2, anchor=(0,0,0))
+    assert abs(np.linalg.norm(F1-F2)/np.linalg.norm(F1+F2)) < 1e-7
+    assert abs(np.linalg.norm(T1-T2)/np.linalg.norm(T1+T2)) < 1e-7

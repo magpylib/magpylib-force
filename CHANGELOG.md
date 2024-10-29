@@ -1,5 +1,10 @@
 # Unpublished
 
+# v0.3.0 (2024/10/29)
+- Added the current.Cicle class to the force computation
+- Improved warning msg when meshing parameter not given
+- Added more physics tests
+
 # v0.2.0 (2024/10/11)
 - Added a warning when no anchor is given to getFT to avoid misuse.
 - Added Cylinder computation
