@@ -1,6 +1,7 @@
 """
 Force computation codes
 """
+import warnings
 
 import magpylib as magpy
 import numpy as np
@@ -10,6 +11,7 @@ from magpylib._src.obj_classes.class_magnet_Cuboid import Cuboid
 from magpylib._src.obj_classes.class_magnet_Sphere import Sphere
 from magpylib._src.obj_classes.class_magnet_Cylinder import Cylinder
 from magpylib._src.obj_classes.class_magnet_CylinderSegment import CylinderSegment
+from magpylib._src.obj_classes.class_current_Circle import Circle
 
 from magpylib_force.meshing import mesh_target
 from magpylib_force.utility import check_input_anchor
@@ -63,8 +65,8 @@ def getFT(sources, targets, anchor=None, eps=1e-5, squeeze=True):
     n = len(targets)
 
     # split targets into lists of similar types
-    TARGET_TYPES = [Cuboid, Polyline, Sphere, Cylinder, CylinderSegment]
-    getFT_FUNCS = [getFTmagnet, getFTcurrent, getFTmagnet, getFTmagnet, getFTmagnet]
+    TARGET_TYPES = [Cuboid, Polyline, Sphere, Cylinder, CylinderSegment, Circle]
+    getFT_FUNCS = [getFTmagnet, getFTcurrent, getFTmagnet, getFTmagnet, getFTmagnet, getFTcurrent_circ]
     objects = [[] for _ in TARGET_TYPES]
     orders  = [[] for _ in TARGET_TYPES]
 
@@ -192,6 +194,41 @@ def getFTmagnet(sources, targets, eps=1e-5, anchor=None):
 
     return np.array((F, -T))
 
+
+def getFTcurrent_circ(sources, targets, anchor=None, eps=None):
+    """
+    The current force computation is designed for Polylines.
+    To make use of this, Circle objects are transformed into Polylines.
+    Its a dirty solution that should be fixed at some point
+    """
+    new_targets = []
+    for tgt in targets:
+        n = tgt.meshing
+        if n<20:
+            warnings.warn(
+                "Circle meshing parameter with low value detected. "
+                "This will give bad results. Please increase meshing. "
+                "Circle meshing defines the number of points on the circle."
+                )
+        r = tgt.diameter/2
+        verts = np.zeros((3,n))
+        verts[2] = np.linspace(0, 2*np.pi, n)
+        verts[0] = r*np.cos(verts[2])
+        verts[1] = r*np.sin(verts[2])
+        verts[2] = 0
+        
+        poly = magpy.current.Polyline(
+            vertices=verts.T,
+            current=tgt.current,
+            position=tgt.position,
+            orientation=tgt.orientation,
+        )
+        poly.meshing=1
+        new_targets.append(poly)
+
+    return getFTcurrent(sources, new_targets, anchor, eps)
+
+
 #pylint: disable=unused-argument
 def getFTcurrent(sources, targets, anchor=None, eps=None):
     """
@@ -203,7 +240,6 @@ def getFTcurrent(sources, targets, anchor=None, eps=None):
     segements = linear segments within Polyline objects
     instances = computation instances, each segment is split into `meshing` points
     """
-
     # number of Polylines
     tgt_number = len(targets)
 

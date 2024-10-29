@@ -13,7 +13,6 @@ from magpylib._src.obj_classes.class_magnet_CylinderSegment import CylinderSegme
 
 #pylint: disable=too-many-locals
 
-
 def mesh_target(obj):
     """
     create mesh for target objects

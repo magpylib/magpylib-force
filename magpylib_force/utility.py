@@ -6,6 +6,7 @@ import warnings
 import numpy as np
 from magpylib._src.obj_classes.class_magnet_Cuboid import Cuboid
 from magpylib._src.obj_classes.class_current_Polyline import Polyline
+from magpylib._src.obj_classes.class_current_Circle import Circle
 from magpylib._src.obj_classes.class_magnet_Sphere import Sphere
 from magpylib._src.obj_classes.class_magnet_Cylinder import Cylinder
 from magpylib._src.obj_classes.class_magnet_CylinderSegment import CylinderSegment
@@ -34,16 +35,16 @@ def check_input_targets(targets):
     if not isinstance(targets, list):
         targets = [targets]
     for t in targets:
-        if not isinstance(t, (Cuboid, Polyline, Sphere, Cylinder, CylinderSegment)):
+        if not isinstance(t, (Cuboid, Polyline, Sphere, Cylinder, CylinderSegment, Circle)):
             raise ValueError(
                 "Bad `targets` input for getFT."
-                " `targets` can only be Cuboids, Polylines, Spheres, Cylinders, and"
-                " CylinderSegments."
+                " `targets` can only be Cuboids, Polylines, Spheres, Cylinders, "
+                " CylinderSegments, and Circles."
                 f" Instead receivd type {type(t)} target."
             )
         if not hasattr(t, "meshing"):
             raise ValueError(
-                "Bad `targets` input for getFT."
+                "Missing input for getFT `targets`."
                 " `targets` must have the `meshing` parameter set."
             )
     return targets
