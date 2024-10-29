@@ -65,8 +65,12 @@ def getFT(sources, targets, anchor=None, eps=1e-5, squeeze=True):
     n = len(targets)
 
     # split targets into lists of similar types
-    TARGET_TYPES = [Cuboid, Polyline, Sphere, Cylinder, CylinderSegment, Circle]
-    getFT_FUNCS = [getFTmagnet, getFTcurrent, getFTmagnet, getFTmagnet, getFTmagnet, getFTcurrent_circ]
+    TARGET_TYPES = [
+        Cuboid, Polyline, Sphere, Cylinder, CylinderSegment, Circle
+    ]
+    getFT_FUNCS = [
+        getFTmagnet, getFTcurrent, getFTmagnet, getFTmagnet, getFTmagnet, getFTcurrent_circ
+    ]
     objects = [[] for _ in TARGET_TYPES]
     orders  = [[] for _ in TARGET_TYPES]
 
@@ -216,7 +220,7 @@ def getFTcurrent_circ(sources, targets, anchor=None, eps=None):
         verts[0] = r*np.cos(verts[2])
         verts[1] = r*np.sin(verts[2])
         verts[2] = 0
-        
+
         poly = magpy.current.Polyline(
             vertices=verts.T,
             current=tgt.current,
