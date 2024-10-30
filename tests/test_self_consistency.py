@@ -237,7 +237,7 @@ def test_consistency_polyline_circle():
     """
 
     src = magpy.magnet.Sphere(diameter=1, polarization=(1,2,3), position=(0,0,-1))
-    
+
     # circle
     loop1 = magpy.current.Circle(diameter=3, current=123)
     loop1.meshing=500
@@ -248,7 +248,7 @@ def test_consistency_polyline_circle():
     verts = [(rr*np.cos(p), rr*np.sin(p), 0) for p in phis]
     loop2 = magpy.current.Polyline(current=ii, vertices=verts)
     loop2.meshing=1
-    
+
     F1,T1 = getFT(src, loop1, anchor=(0,0,0))
     F2,T2 = getFT(src, loop2, anchor=(0,0,0))
     assert abs(np.linalg.norm(F1-F2)/np.linalg.norm(F1+F2)) < 1e-7

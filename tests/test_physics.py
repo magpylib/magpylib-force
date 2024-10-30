@@ -323,7 +323,7 @@ def test_force_between_cocentric_loops():
     loop2 = magpy.current.Circle(diameter=2*r2, current=i2, position=(0,0,z2))
     loop2.meshing=1000
     F_num = getFT(loop1, loop2, anchor=(0,0,0))[0,2]
-    
+
     # analytical solution
     k2 = 4*r1*r2 / ((r1+r2)**2+(z1-z2)**2)
     k = np.sqrt(k2)
@@ -331,4 +331,4 @@ def test_force_between_cocentric_loops():
     F_ana = pf*( (2-k2)/(1-k2)*ellipe(k**2) - 2*ellipk(k**2) )
 
     assert abs((F_num - F_ana)/(F_num + F_ana)) < 1e-5
-        
+
