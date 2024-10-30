@@ -1,0 +1,11 @@
+name: Feedback / Bugs / Questions
+description: none
+body:
+  - type: textarea
+    id: Feedback / Bugs / Questions
+    attributes:
+      label: Feedback / Bugs / Questions
+      placeholder: |
+        For Bugs, if possible reduce to minimal example, post code, and Magpylib version.
+    validations:
+      required: true
