@@ -9,6 +9,7 @@ from magpylib._src.obj_classes.class_current_Polyline import Polyline
 from magpylib._src.obj_classes.class_current_Circle import Circle
 from magpylib._src.obj_classes.class_magnet_Sphere import Sphere
 from magpylib._src.obj_classes.class_magnet_Cylinder import Cylinder
+from magpylib._src.obj_classes.class_misc_Dipole import Dipole
 from magpylib._src.obj_classes.class_magnet_CylinderSegment import CylinderSegment
 
 def check_input_anchor(anchor):
@@ -47,4 +48,11 @@ def check_input_targets(targets):
                 "Missing input for getFT `targets`."
                 " `targets` must have the `meshing` parameter set."
             )
+        if not isinstance(t, (Polyline, Dipole)):
+            if np.isscalar(t.meshing):
+                if t.meshing<20:
+                    warnings.warn(
+                        "Input parameter `meshing` is set to a low value which will result in "
+                        "inaccurate computation of force and torque."
+                    )
     return targets
