@@ -47,4 +47,11 @@ def check_input_targets(targets):
                 "Missing input for getFT `targets`."
                 " `targets` must have the `meshing` parameter set."
             )
+        if not isinstance(t, (Polyline, )):
+            if np.isscalar(t.meshing):
+                if t.meshing<20:
+                    warnings.warn(
+                        "Input parameter `meshing` is set to a low value which will result in "
+                        "inaccurate computation of force and torque."
+                    )
     return targets

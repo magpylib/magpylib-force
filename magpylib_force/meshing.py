@@ -32,12 +32,15 @@ def mesh_sphere(obj):
     """
     create sphere mesh from object meshing parameter
     """
-    n = obj.meshing
+    n = obj.meshing          # target number of elements
+    n /= np.pi/6             # sphere volume VS cube volume ratio
+    n_grid = int(n**(1/3))   # splitting of cube sides
+
     dia = obj.diameter
-    a = -dia/2+dia/(2*n)
-    b =  dia/2-dia/(2*n)
-    c = n*1j
-    mesh = np.mgrid[a:b:c, a:b:c, a:b:c].T.reshape(n**3,3)
+    a = -dia/2+dia/(2*n_grid)
+    b =  dia/2-dia/(2*n_grid)
+    c = n_grid*1j
+    mesh = np.mgrid[a:b:c, a:b:c, a:b:c].T.reshape(n_grid**3,3)
     return mesh[np.linalg.norm(mesh, axis=1)<dia/2]
 
 

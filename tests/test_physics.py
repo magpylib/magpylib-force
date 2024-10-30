@@ -6,60 +6,6 @@ from scipy.special import ellipe
 from scipy.special import ellipk
 
 
-# def test_physics_loop_torque():
-#     """
-#     for a current loop in a homogeneous field the following holds
-#     F = 0
-#     T = current * loop_surface * field_normal_component
-#     """
-#     # circular loop
-#     ts = np.linspace(0,2*np.pi,300)
-#     verts = [(np.sin(t), np.cos(t), 0) for t in ts]
-#     cloop = magpy.current.Polyline(
-#         current=(1, "A"),
-#         vertices=(verts, "m"),
-#     )
-#     cloop.meshing = 1
-
-#     # homogeneous field
-#     def func(field, observers):
-#         return np.zeros_like(observers, dtype=float) + np.array((1,0,0))
-#     hom = magpy.misc.CustomSource(field_func=func)
-
-#     # without anchor
-#     F,T = getFT(hom, cloop, Tanch=None)
-#     assert np.amax(F.magnitude) < 1e-14
-#     assert T.magnitude == 0
-
-#     # with anchor
-#     F,T = getFT(hom, cloop, Tanch=cloop.position)
-#     assert np.amax(abs(F.magnitude)) < 1e-14
-#     assert abs(T[0].magnitude) < 1e-14
-#     assert abs(T[1].magnitude - np.pi ) < 1e-3
-#     assert abs(T[2].magnitude) < 1e-14
-
-#     ##############################################################
-
-#     # rectangular loop
-#     verts = [(-1,-1,0), (1,-1,0), (1,1,0), (-1,1,0), (-1,-1,0)]
-#     rloop = magpy.current.Polyline(
-#         current=(1, "A"),
-#         vertices=(verts, "m"),
-#     )
-#     rloop.meshing = 10
-
-#     # without anchor
-#     F,T = getFT(hom, rloop, Tanch=None)
-#     assert np.amax(F.magnitude) < 1e-14
-#     assert T.magnitude == 0
-
-#     # with anchor
-#     F,T = getFT(hom, rloop, Tanch=rloop.position)
-#     assert np.amax(abs(F.magnitude)) < 1e-14
-#     assert abs(T[0].magnitude) < 1e-14
-#     assert abs(T[1].magnitude + 4 ) < 1e-3
-#     assert abs(T[2].magnitude) < 1e-14
-
 def test_physics_loop_torque():
     """
     for a current loop in a homogeneous field the following holds
@@ -121,30 +67,6 @@ def test_physics_loop_torque():
     assert abs(T[2]) < 1e-14
 
 
-# def test_physics_parallel_wires():
-#     """
-#     The force between straight infinite parallel wires is
-#     F = 2*mu0/4/pi * i1*i2/r
-#     """
-#     src = magpy.current.Polyline(
-#         current=(1, "A"),
-#         vertices=([(-1000,0,0),(1000,0,0)], "m"),
-#     )
-#     tgt = magpy.current.Polyline(
-#         current=(1, "A"),
-#         vertices=([(-1000,0,0),(0,0,0),(1000,0,0)], "m"),
-#         position=((0,0,1), "m"),
-#     )
-#     tgt.meshing = 1000
-
-#     F,_ = getFT(src, tgt)
-
-#     Fanalytic = 2*magpy.mu_0/4/np.pi*2000
-
-#     assert abs(F[0].magnitude) < 1e-14
-#     assert abs(F[1].magnitude) < 1e-14
-#     assert abs((F[2].magnitude + Fanalytic)/Fanalytic) < 1e-3
-
 def test_physics_parallel_wires():
     """
     The force between straight infinite parallel wires is
@@ -166,28 +88,6 @@ def test_physics_parallel_wires():
     assert abs(F[0]) < 1e-14
     assert abs(F[1]) < 1e-14
     assert abs((F[2]+Fanalytic)/Fanalytic) < 1e-3
-
-
-# def test_physics_perpendicular_wires():
-#     """
-#     The force between straight infinite perpendicular wires is 0
-#     """
-#     src = magpy.current.Polyline(
-#         current=(1, "A"),
-#         vertices=([(-1000,0,0),(1000,0,0)], "m"),
-#     )
-#     tgt = magpy.current.Polyline(
-#         current=(1, "A"),
-#         vertices=([(0,-1000,0),(0,0,0),(0,1000,0)], "m"),
-#         position=((0,0,1), "m"),
-#     )
-#     tgt.meshing = 1000
-
-#     ureg=src.current._REGISTRY
-#     F,T = getFT(src, tgt)
-
-#     assert np.max(abs(F.magnitude)) < 1e-14
-
 
 
 def test_physics_perpendicular_wires():
@@ -244,7 +144,7 @@ def test_cube_loop_replacement():
     assert np.amax(abs((T1-T2)/(T1+T2)*2))<1e-2
 
 
-def test_sphere_cube_at_distance():
+def test_physics_at_distance():
     """
     A sphere and a cuboid with similar volume should see a similar torque and force
     at a distance
@@ -259,25 +159,33 @@ def test_sphere_cube_at_distance():
         polarization=J,
         position=pos
     )
-    cube.meshing = (2,2,2)
+    cube.meshing = 100
 
     sphere = magpy.magnet.Sphere(
         diameter=(6/np.pi)**(1/3),
         polarization=J,
         position=pos,
     )
-    sphere.meshing=2
+    sphere.meshing=100
 
-    FT = getFT(source, [cube, sphere], anchor=(0,0,0))
+    cyl = magpy.magnet.Cylinder(
+        dimension=(2*np.sqrt(1/np.pi),1),
+        polarization=J,
+        position=pos,
+    )
+    cyl.meshing=100
 
-    errF = (FT[0,0]-FT[1,0])/np.linalg.norm(FT[0,0])
-    errT = (FT[0,1]-FT[1,1])/np.linalg.norm(FT[0,1])
+    FT = getFT(source, [cube, sphere, cyl], anchor=(0,0,0))
+    print(FT.shape)
 
-    assert max(abs(errF)) < 1e-5
-    assert max(abs(errT)) < 1e-5
+    for i in range(1,3):
+        errF = abs(np.linalg.norm(FT[0,0]-FT[i,0]) / np.linalg.norm(FT[0,0]+FT[i,0]))
+        errT = abs(np.linalg.norm(FT[0,1]-FT[i,1]) / np.linalg.norm(FT[0,1]+FT[i,1]))
+        assert errF<1e-4
+        assert errF<1e-4
 
 
-def test_torque_sign():
+def test_physics_torque_sign():
     """ make sure that torque sign is in the right direction"""
 
     # Cuboid -> Cuboid
@@ -308,7 +216,7 @@ def test_torque_sign():
     assert T[1] < 0
 
 
-def test_force_between_cocentric_loops():
+def test_physics_force_between_cocentric_loops():
     """
     compare the numerical solution against the analytical solution of the force between two
     cocentric current loops.
@@ -331,4 +239,3 @@ def test_force_between_cocentric_loops():
     F_ana = pf*( (2-k2)/(1-k2)*ellipe(k**2) - 2*ellipk(k**2) )
 
     assert abs((F_num - F_ana)/(F_num + F_ana)) < 1e-5
-

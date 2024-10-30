@@ -1,5 +1,10 @@
 # Unpublished
 
+# v0.3.1 (2024/10/30)
+- Improved Mesing to accept simimal scalar value for all classes except Polyline and Dipole
+- Include warning when meshing is low
+- Improve physics tests
+
 # v0.3.0 (2024/10/29)
 - Added the current.Cicle class to the force computation
 - Improved warning msg when meshing parameter not given
