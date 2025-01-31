@@ -10,6 +10,7 @@ from magpylib._src.obj_classes.class_current_Circle import Circle
 from magpylib._src.obj_classes.class_magnet_Sphere import Sphere
 from magpylib._src.obj_classes.class_magnet_Cylinder import Cylinder
 from magpylib._src.obj_classes.class_magnet_CylinderSegment import CylinderSegment
+from magpylib._src.obj_classes.class_misc_Dipole import Dipole
 
 def check_input_anchor(anchor):
     """
@@ -35,23 +36,24 @@ def check_input_targets(targets):
     if not isinstance(targets, list):
         targets = [targets]
     for t in targets:
-        if not isinstance(t, (Cuboid, Polyline, Sphere, Cylinder, CylinderSegment, Circle)):
+        if not isinstance(t, (Cuboid, Polyline, Sphere, Cylinder, CylinderSegment, Circle, Dipole)):
             raise ValueError(
                 "Bad `targets` input for getFT."
                 " `targets` can only be Cuboids, Polylines, Spheres, Cylinders, "
                 " CylinderSegments, and Circles."
                 f" Instead receivd type {type(t)} target."
             )
-        if not hasattr(t, "meshing"):
-            raise ValueError(
-                "Missing input for getFT `targets`."
-                " `targets` must have the `meshing` parameter set."
-            )
-        if not isinstance(t, (Polyline, )):
-            if np.isscalar(t.meshing):
-                if t.meshing<20:
-                    warnings.warn(
-                        "Input parameter `meshing` is set to a low value which will result in "
-                        "inaccurate computation of force and torque."
-                    )
+        if not isinstance(t, (Dipole, )):
+            if not hasattr(t, "meshing"):
+                raise ValueError(
+                    "Missing input for getFT `targets`."
+                    " `targets` must have the `meshing` parameter set."
+                )
+            if not isinstance(t, (Polyline, )):
+                if np.isscalar(t.meshing):
+                    if t.meshing<20:
+                        warnings.warn(
+                            "Input parameter `meshing` is set to a low value which will result in "
+                            "inaccurate computation of force and torque."
+                        )
     return targets

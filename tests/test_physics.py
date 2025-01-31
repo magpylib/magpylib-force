@@ -239,3 +239,31 @@ def test_physics_force_between_cocentric_loops():
     F_ana = pf*( (2-k2)/(1-k2)*ellipe(k**2) - 2*ellipk(k**2) )
 
     assert abs((F_num - F_ana)/(F_num + F_ana)) < 1e-5
+
+
+def test_physics_force_between_two_dipoles():
+    """
+    Compare force between two magnetic Dipoles with well-known formula
+    (e.g. https://en.wikipedia.org/wiki/Magnetic_dipole%E2%80%93dipole_interaction)
+    """
+    m1, m2 = np.array((0.976, 4.304, 2.055)), np.array((0.878, -1.527, 2.918))
+    p1, p2 = np.array((-1.248, 7.835, 9.273)), np.array((-2.331, 5.835, 0.578))
+
+    # numerical solution
+    dipole1 = magpy.misc.Dipole(position=p1, moment=m1)
+    dipole2 = magpy.misc.Dipole(position=p2, moment=m2)
+    F_num = getFT(dipole1, dipole2, anchor=(0,0,0))[0,:]
+    #F_num = getFT([dipole1], [dipole2, dipole2])
+
+    # analytical solution
+    r = p2 - p1
+    r_abs = np.linalg.norm(r)
+    r_unit = r / r_abs
+    F_ana = 3*magpy.mu_0 / (4*np.pi*r_abs**4) * (
+        np.cross(np.cross(r_unit, m1), m2) + 
+        np.cross(np.cross(r_unit, m2), m1) - 
+        2*r_unit*np.dot(m1, m2) + 
+        5*r_unit*(np.dot(np.cross(r_unit, m1), np.cross(r_unit, m2)))
+        )
+
+    np.testing.assert_allclose(F_num, F_ana)
