@@ -1,4 +1,7 @@
-# Unpublished
+# v0.4.0 (2025/02/03)
+- Implementation of Dipole as target
+- Bugfix for magnets with meshing parameter = 1
+- Additional tests for Dipole extension
 
 # v0.3.1 (2024/10/30)
 - Improved Mesing to accept simimal scalar value for all classes except Polyline and Dipole
