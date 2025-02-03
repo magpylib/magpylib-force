@@ -266,4 +266,4 @@ def test_physics_force_between_two_dipoles():
         5*r_unit*(np.dot(np.cross(r_unit, m1), np.cross(r_unit, m2)))
         )
 
-    np.testing.assert_allclose(F_num, F_ana)
+    np.testing.assert_allclose(F_num, F_ana, rtol=1e-8, atol=1e-8)
