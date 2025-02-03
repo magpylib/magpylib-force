@@ -260,9 +260,9 @@ def test_physics_force_between_two_dipoles():
     r_abs = np.linalg.norm(r)
     r_unit = r / r_abs
     F_ana = 3*magpy.mu_0 / (4*np.pi*r_abs**4) * (
-        np.cross(np.cross(r_unit, m1), m2) + 
-        np.cross(np.cross(r_unit, m2), m1) - 
-        2*r_unit*np.dot(m1, m2) + 
+        np.cross(np.cross(r_unit, m1), m2) +
+        np.cross(np.cross(r_unit, m2), m1) -
+        2*r_unit*np.dot(m1, m2) +
         5*r_unit*(np.dot(np.cross(r_unit, m1), np.cross(r_unit, m2)))
         )
 

@@ -289,4 +289,3 @@ def test_consistency_sphere_dipole():
     FT_dipole = getFT(src, dipole, anchor=(0,0,0))
 
     np.testing.assert_allclose(FT_sphere, FT_dipole, rtol=1e-6, atol=1e-6)
-
