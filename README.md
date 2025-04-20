@@ -1,4 +1,30 @@
-# Magpylib-Force
+# magpylib-force
+
+[![Actions Status][actions-badge]][actions-link]
+[![Documentation Status][rtd-badge]][rtd-link]
+
+[![PyPI version][pypi-version]][pypi-link]
+[![Conda-Forge][conda-badge]][conda-link]
+[![PyPI platforms][pypi-platforms]][pypi-link]
+
+[![GitHub Discussion][github-discussions-badge]][github-discussions-link]
+
+<!-- SPHINX-START -->
+
+<!-- prettier-ignore-start -->
+[actions-badge]:            https://github.com/magpylib/magpylib-force/workflows/CI/badge.svg
+[actions-link]:             https://github.com/magpylib/magpylib-force/actions
+[conda-badge]:              https://img.shields.io/conda/vn/conda-forge/magpylib-force
+[conda-link]:               https://github.com/conda-forge/magpylib-force-feedstock
+[github-discussions-badge]: https://img.shields.io/static/v1?label=Discussions&message=Ask&color=blue&logo=github
+[github-discussions-link]:  https://github.com/magpylib/magpylib-force/discussions
+[pypi-link]:                https://pypi.org/project/magpylib-force/
+[pypi-platforms]:           https://img.shields.io/pypi/pyversions/magpylib-force
+[pypi-version]:             https://img.shields.io/pypi/v/magpylib-force
+[rtd-badge]:                https://readthedocs.org/projects/magpylib-force/badge/?version=latest
+[rtd-link]:                 https://magpylib-force.readthedocs.io/en/latest/?badge=latest
+
+<!-- prettier-ignore-end -->
 
 This package provides force and torque computation for Magpylib objects. It is work in progress and will finally be integrated into the Magpylib package.
 
@@ -9,9 +35,6 @@ This work is supported by a NUMFOCUS grant: SDG 2024 round 1
 - does not work with paths
 - limited target types available
 
-# Installation
-
-`pip install magpylib-force`
 
 # Documentation and Examples
 
