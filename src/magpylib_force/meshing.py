@@ -47,7 +47,8 @@ def mesh_sphere(obj):
     a = -dia / 2 + dia / (2 * n_grid)
     b = dia / 2 - dia / (2 * n_grid)
     c = n_grid * 1j
-    mesh = np.mgrid[a:b:c, a:b:c, a:b:c].T.reshape(n_grid**3, 3)
+    mesh = np.mgrid[a:b:c, a:b:c, a:b:c]
+    mesh = mesh.T.reshape(n_grid**3, 3) # pylint: disable=no-member
     return mesh[np.linalg.norm(mesh, axis=1) < dia / 2]
 
 

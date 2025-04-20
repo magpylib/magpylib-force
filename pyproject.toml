@@ -162,4 +162,5 @@ messages_control.disable = [
   "wrong-import-position",
   "invalid-name", # TODO - review later
   "protected-access", # TODO - review later
+  "unused-argument", # already covered by ruff
 ]
