@@ -26,7 +26,7 @@ def check_input_anchor(anchor):
             stacklevel=2,
         )
         return None
-    if isinstance(anchor, (list, tuple)):
+    if isinstance(anchor, list | tuple):
         anchor = np.array(anchor)
     if not isinstance(anchor, np.ndarray):
         msg = "Anchor input must be list tuple or array."
@@ -43,7 +43,7 @@ def check_input_targets(targets):
         targets = [targets]
     for t in targets:
         if not isinstance(
-            t, (Cuboid, Polyline, Sphere, Cylinder, CylinderSegment, Circle)
+            t, Cuboid | Polyline | Sphere | Cylinder | CylinderSegment | Circle
         ):
             msg = (
                 "Bad `targets` input for getFT."
@@ -58,7 +58,7 @@ def check_input_targets(targets):
                 " `targets` must have the `meshing` parameter set."
             )
             raise ValueError(msg)
-        if not isinstance(t, (Polyline,)) and np.isscalar(t.meshing) and t.meshing < 20:
+        if not isinstance(t, Polyline) and np.isscalar(t.meshing) and t.meshing < 20:
             warnings.warn(
                 "Input parameter `meshing` is set to a low value which will result in "
                 "inaccurate computation of force and torque.",
