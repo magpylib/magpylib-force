@@ -181,7 +181,7 @@ def test_physics_at_distance():
             np.linalg.norm(FT[0, 1] - FT[i, 1]) / np.linalg.norm(FT[0, 1] + FT[i, 1])
         )
         assert errF < 1e-4
-        assert errF < 1e-4
+        assert errT < 1e-4
 
 
 def test_physics_torque_sign():
