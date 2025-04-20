@@ -494,7 +494,7 @@ def test_ANSYS_loop_magnet():
         polarization=(1, 0, 0),
     )
 
-    for dat, dat2 in zip(dataF, dataT):
+    for dat, dat2 in zip(dataF, dataT, strict=False):
         c1y, c1z, c1x = dat[:3]
         pos = np.array((c1x * 1e-3, c1y, c1z)) * 1e-3
         pos[2] += 0.5 * 1e-3
@@ -862,7 +862,7 @@ def test_ANSYS_magnet_current_close():
         )
     )
 
-    for d, t in zip(datF, datT):
+    for d, t in zip(datF, datT, strict=False):
         i0 = d[0] * 1e-3  # ampere
         pos = np.array((d[3] * 1e-3, d[1], d[2])) * 1e-3
         f2 = np.array((d[4], d[5], d[6])) * 1e-6

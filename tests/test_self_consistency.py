@@ -218,7 +218,7 @@ def test_consistency_cylinder_segment_cuboid():
         (1, 2, 3),
         (0, 0, 1),
     ]
-    for dim, pol in zip(dims, pols):
+    for dim, pol in zip(dims, pols, strict=False):
         cyls = magpy.magnet.CylinderSegment(dimension=dim, polarization=pol)
         cyls.rotate_from_angax(-45, (1, 1, 1))
         cyls.meshing = 300

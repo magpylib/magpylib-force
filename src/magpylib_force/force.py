@@ -91,7 +91,7 @@ def getFT(sources, targets, anchor=None, eps=1e-5, squeeze=True):
         if objects[i]:
             ft_part = getFT_FUNCS[i](sources, objects[i], eps=eps, anchor=anchor)
             ft_part = np.swapaxes(ft_part, 0, 1)
-            for ft, j in zip(ft_part, orders[i]):
+            for ft, j in zip(ft_part, orders[i], strict=False):
                 FT[j] = ft
 
     if squeeze:
