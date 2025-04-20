@@ -1,25 +1,25 @@
 """
 Force computation codes
 """
+
+from __future__ import annotations
+
 import warnings
 
 import magpylib as magpy
 import numpy as np
-
+from magpylib._src.obj_classes.class_current_Circle import Circle
 from magpylib._src.obj_classes.class_current_Polyline import Polyline
 from magpylib._src.obj_classes.class_magnet_Cuboid import Cuboid
-from magpylib._src.obj_classes.class_magnet_Sphere import Sphere
 from magpylib._src.obj_classes.class_magnet_Cylinder import Cylinder
 from magpylib._src.obj_classes.class_magnet_CylinderSegment import CylinderSegment
-from magpylib._src.obj_classes.class_current_Circle import Circle
+from magpylib._src.obj_classes.class_magnet_Sphere import Sphere
 
 from magpylib_force.meshing import mesh_target
-from magpylib_force.utility import check_input_anchor
-from magpylib_force.utility import check_input_targets
+from magpylib_force.utility import check_input_anchor, check_input_targets
 
-
-#pylint: disable=invalid-name
-#pylint: disable=too-many-locals
+# pylint: disable=invalid-name
+# pylint: disable=too-many-locals
 
 
 def getFT(sources, targets, anchor=None, eps=1e-5, squeeze=True):
@@ -65,17 +65,20 @@ def getFT(sources, targets, anchor=None, eps=1e-5, squeeze=True):
     n = len(targets)
 
     # split targets into lists of similar types
-    TARGET_TYPES = [
-        Cuboid, Polyline, Sphere, Cylinder, CylinderSegment, Circle
-    ]
+    TARGET_TYPES = [Cuboid, Polyline, Sphere, Cylinder, CylinderSegment, Circle]
     getFT_FUNCS = [
-        getFTmagnet, getFTcurrent, getFTmagnet, getFTmagnet, getFTmagnet, getFTcurrent_circ
+        getFTmagnet,
+        getFTcurrent,
+        getFTmagnet,
+        getFTmagnet,
+        getFTmagnet,
+        getFTcurrent_circ,
     ]
     objects = [[] for _ in TARGET_TYPES]
-    orders  = [[] for _ in TARGET_TYPES]
+    orders = [[] for _ in TARGET_TYPES]
 
-    for i,tgt in enumerate(targets):
-        for j,ttyp in enumerate(TARGET_TYPES):
+    for i, tgt in enumerate(targets):
+        for j, ttyp in enumerate(TARGET_TYPES):
             if isinstance(tgt, ttyp):
                 objects[j].append(tgt)
                 orders[j].append(i)
@@ -88,7 +91,7 @@ def getFT(sources, targets, anchor=None, eps=1e-5, squeeze=True):
         if objects[i]:
             ft_part = getFT_FUNCS[i](sources, objects[i], eps=eps, anchor=anchor)
             ft_part = np.swapaxes(ft_part, 0, 1)
-            for ft,j in zip(ft_part, orders[i]):
+            for ft, j in zip(ft_part, orders[i]):
                 FT[j] = ft
 
     if squeeze:
@@ -110,8 +113,8 @@ def volume(target):
         d, h = target.dimension
         return d**2 * np.pi * h / 4
     if isinstance(target, CylinderSegment):
-        r1,r2,h,phi1,phi2 = target.dimension
-        return (r2**2-r1**2)*np.pi*h * (phi2-phi1)/360
+        r1, r2, h, phi1, phi2 = target.dimension
+        return (r2**2 - r1**2) * np.pi * h * (phi2 - phi1) / 360
     raise RuntimeError("fktn `volume` - I shouldt be here.")
 
 
@@ -155,46 +158,60 @@ def getFTmagnet(sources, targets, eps=1e-5, anchor=None):
     insti = np.r_[0, np.cumsum(inst_numbers)]
 
     # field computation positions (1xfor B, 6x for gradB)
-    POSS = np.zeros((no_inst,7,3))
+    POSS = np.zeros((no_inst, 7, 3))
 
     # moment of each instance
-    MOM = np.zeros((no_inst,3))
+    MOM = np.zeros((no_inst, 3))
 
     # MISSING: eps should be defined relative to the sizes of the objects
-    eps_vec = np.array([(0,0,0),(eps,0,0),(-eps,0,0),(0,eps,0),(0,-eps,0),(0,0,eps),(0,0,-eps)])
+    eps_vec = np.array(
+        [
+            (0, 0, 0),
+            (eps, 0, 0),
+            (-eps, 0, 0),
+            (0, eps, 0),
+            (0, -eps, 0),
+            (0, 0, eps),
+            (0, 0, -eps),
+        ]
+    )
 
-    for i,tgt in enumerate(targets):
+    for i, tgt in enumerate(targets):
         tgt_vol = volume(tgt)
         inst_mom = tgt.orientation.apply(tgt.magnetization) * tgt_vol / inst_numbers[i]
-        MOM[insti[i]:insti[i+1]] = inst_mom
+        MOM[insti[i] : insti[i + 1]] = inst_mom
 
         mesh = meshes[i]
-        #mesh_target(tgt)
-        #import matplotlib.pyplot as plt
-        #ax = plt.figure().add_subplot(projection='3d')
-        #ax.plot(mesh[:,0], mesh[:,1], mesh[:,2], ls='', marker='.')
+        # mesh_target(tgt)
+        # import matplotlib.pyplot as plt
+        # ax = plt.figure().add_subplot(projection='3d')
+        # ax.plot(mesh[:,0], mesh[:,1], mesh[:,2], ls='', marker='.')
 
         mesh = tgt.orientation.apply(mesh)
-        #ax.plot(mesh[:,0], mesh[:,1], mesh[:,2], ls='', marker='.', color='r')
-        #plt.show()
-        #import sys
-        #sys.exit()
+        # ax.plot(mesh[:,0], mesh[:,1], mesh[:,2], ls='', marker='.', color='r')
+        # plt.show()
+        # import sys
+        # sys.exit()
 
-        for j,ev in enumerate(eps_vec):
-            POSS[insti[i]:insti[i+1],j] = mesh + ev + tgt.position
+        for j, ev in enumerate(eps_vec):
+            POSS[insti[i] : insti[i + 1], j] = mesh + ev + tgt.position
 
     BB = magpy.getB(sources, POSS, sumup=True)
-    gradB = (BB[:,1::2]-BB[:,2::2]) / (2*eps)
-    gradB = np.swapaxes(gradB,0,1)
+    gradB = (BB[:, 1::2] - BB[:, 2::2]) / (2 * eps)
+    gradB = np.swapaxes(gradB, 0, 1)
 
-    Fs = np.sum((gradB*MOM),axis=2).T
-    #Ts = np.zeros((no_inst,3))
-    Ts = np.cross(BB[:,0], MOM)
+    Fs = np.sum((gradB * MOM), axis=2).T
+    # Ts = np.zeros((no_inst,3))
+    Ts = np.cross(BB[:, 0], MOM)
     if anchor is not None:
-        Ts -= np.cross(POSS[:,0]-anchor, Fs)
+        Ts -= np.cross(POSS[:, 0] - anchor, Fs)
 
-    T = np.array([np.sum(Ts[insti[i]:insti[i+1]],axis=0) for i in range(tgt_number)])
-    F = np.array([np.sum(Fs[insti[i]:insti[i+1]],axis=0) for i in range(tgt_number)])
+    T = np.array(
+        [np.sum(Ts[insti[i] : insti[i + 1]], axis=0) for i in range(tgt_number)]
+    )
+    F = np.array(
+        [np.sum(Fs[insti[i] : insti[i + 1]], axis=0) for i in range(tgt_number)]
+    )
 
     return np.array((F, -T))
 
@@ -208,17 +225,17 @@ def getFTcurrent_circ(sources, targets, anchor=None, eps=None):
     new_targets = []
     for tgt in targets:
         n = tgt.meshing
-        if n<20:
+        if n < 20:
             warnings.warn(
                 "Circle meshing parameter with low value detected. "
                 "This will give bad results. Please increase meshing. "
                 "Circle meshing defines the number of points on the circle."
-                )
-        r = tgt.diameter/2
-        verts = np.zeros((3,n))
-        verts[2] = np.linspace(0, 2*np.pi, n)
-        verts[0] = r*np.cos(verts[2])
-        verts[1] = r*np.sin(verts[2])
+            )
+        r = tgt.diameter / 2
+        verts = np.zeros((3, n))
+        verts[2] = np.linspace(0, 2 * np.pi, n)
+        verts[0] = r * np.cos(verts[2])
+        verts[1] = r * np.sin(verts[2])
         verts[2] = 0
 
         poly = magpy.current.Polyline(
@@ -227,13 +244,13 @@ def getFTcurrent_circ(sources, targets, anchor=None, eps=None):
             position=tgt.position,
             orientation=tgt.orientation,
         )
-        poly.meshing=1
+        poly.meshing = 1
         new_targets.append(poly)
 
     return getFTcurrent(sources, new_targets, anchor, eps)
 
 
-#pylint: disable=unused-argument
+# pylint: disable=unused-argument
 def getFTcurrent(sources, targets, anchor=None, eps=None):
     """
     compute force acting on tgt Polyline
@@ -248,13 +265,13 @@ def getFTcurrent(sources, targets, anchor=None, eps=None):
     tgt_number = len(targets)
 
     # segments of each Polyline
-    seg_numbers = np.array([len(tgt.vertices)-1 for tgt in targets])
+    seg_numbers = np.array([len(tgt.vertices) - 1 for tgt in targets])
 
     # number of mesh-points of each Polyline
     mesh_numbers = np.array([tgt.meshing for tgt in targets])
 
     # number of instances of each Polyline
-    inst_numbers = seg_numbers*mesh_numbers
+    inst_numbers = seg_numbers * mesh_numbers
 
     # total number of instances
     no_inst = np.sum(inst_numbers)
@@ -263,25 +280,32 @@ def getFTcurrent(sources, targets, anchor=None, eps=None):
     insti = np.r_[0, np.cumsum(inst_numbers)]
 
     # path vector of each instance
-    LVEC = np.zeros((no_inst,3))
+    LVEC = np.zeros((no_inst, 3))
     # central location of each instance
-    POSS = np.zeros((no_inst,3))
+    POSS = np.zeros((no_inst, 3))
     # current of each instance
     CURR = np.zeros((no_inst,))
 
-    for i,tgt in enumerate(targets):
+    for i, tgt in enumerate(targets):
         verts = tgt.orientation.apply(tgt.vertices)
         mesh = mesh_numbers[i]
 
-        lvec = np.repeat(verts[1:] - verts[:-1], mesh, axis=0)/mesh
-        LVEC[insti[i]:insti[i+1]] = lvec
+        lvec = np.repeat(verts[1:] - verts[:-1], mesh, axis=0) / mesh
+        LVEC[insti[i] : insti[i + 1]] = lvec
 
-        CURR[insti[i]:insti[i+1]] = [tgt.current]*mesh*seg_numbers[i]
+        CURR[insti[i] : insti[i + 1]] = [tgt.current] * mesh * seg_numbers[i]
 
         for j in range(seg_numbers[i]):
-            #pylint: disable=line-too-long
-            poss = np.linspace(verts[j]+lvec[j*mesh]/2, verts[j+1]-lvec[j*mesh]/2, mesh) + tgt.position
-            POSS[insti[i]+mesh*j:insti[i]+mesh*(j+1)] = poss
+            # pylint: disable=line-too-long
+            poss = (
+                np.linspace(
+                    verts[j] + lvec[j * mesh] / 2,
+                    verts[j + 1] - lvec[j * mesh] / 2,
+                    mesh,
+                )
+                + tgt.position
+            )
+            POSS[insti[i] + mesh * j : insti[i] + mesh * (j + 1)] = poss
 
     # field of every instance
     B = magpy.getB(sources, POSS, sumup=True)
@@ -292,11 +316,15 @@ def getFTcurrent(sources, targets, anchor=None, eps=None):
     # torque on every instance + sumup for every target
     if anchor is not None:
         T = np.cross(anchor - POSS, F)
-        T = np.array([np.sum(T[insti[i]:insti[i+1]],axis=0) for i in range(tgt_number)])
+        T = np.array(
+            [np.sum(T[insti[i] : insti[i + 1]], axis=0) for i in range(tgt_number)]
+        )
     else:
-        T = np.zeros((tgt_number,3))
+        T = np.zeros((tgt_number, 3))
 
     # sumup force for every target
-    F = np.array([np.sum(F[insti[i]:insti[i+1]],axis=0) for i in range(tgt_number)])
+    F = np.array(
+        [np.sum(F[insti[i] : insti[i + 1]], axis=0) for i in range(tgt_number)]
+    )
 
     return np.array((F, -T))
