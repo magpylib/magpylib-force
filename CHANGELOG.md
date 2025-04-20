@@ -9,7 +9,7 @@
 
 # v0.3.0 (2024/10/29)
 
-- Added the current.Cicle class to the force computation
+- Added the current.Circle class to the force computation
 - Improved warning msg when meshing parameter not given
 - Added more physics tests
 

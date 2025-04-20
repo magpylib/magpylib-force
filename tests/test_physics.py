@@ -25,7 +25,7 @@ def test_physics_loop_torque():
     cloop.meshing = 1
 
     # homogeneous field
-    def func(field, observers):
+    def func(field, observers):  # noqa:  ARG001
         return np.zeros_like(observers, dtype=float) + np.array((1, 0, 0))
 
     hom = magpy.misc.CustomSource(field_func=func)

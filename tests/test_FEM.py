@@ -494,7 +494,7 @@ def test_ANSYS_loop_magnet():
         polarization=(1, 0, 0),
     )
 
-    for ii, (dat, dat2) in enumerate(zip(dataF, dataT)):
+    for dat, dat2 in zip(dataF, dataT):
         c1y, c1z, c1x = dat[:3]
         pos = np.array((c1x * 1e-3, c1y, c1z)) * 1e-3
         pos[2] += 0.5 * 1e-3
@@ -532,7 +532,7 @@ def test_ANSYS_loop_magnet():
 
 
 def test_ANSYS_magnet_current_close():
-    """curren loop close to magnet"""
+    """current loop close to magnet"""
 
     magnet = magpy.magnet.Cuboid(
         dimension=np.array((0.5, 10, 0.3)) * 1e-3,
@@ -862,14 +862,13 @@ def test_ANSYS_magnet_current_close():
         )
     )
 
-    n = len(datF)
-    for i, (d, t) in enumerate(zip(datF, datT)):
+    for d, t in zip(datF, datT):
         i0 = d[0] * 1e-3  # ampere
         pos = np.array((d[3] * 1e-3, d[1], d[2])) * 1e-3
         f2 = np.array((d[4], d[5], d[6])) * 1e-6
-        f1 = np.array((d[7], d[8], d[9])) * 1e-6
+        # f1 = np.array((d[7], d[8], d[9])) * 1e-6 # TODO check if necessary
 
-        t1 = np.array((t[4], t[5], t[6])) * 1e-9
+        # t1 = np.array((t[4], t[5], t[6])) * 1e-9 # TODO check if necessary
         t2 = np.array((t[7], t[8], t[9])) * 1e-9
 
         for wire in wires:

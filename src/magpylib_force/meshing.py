@@ -18,17 +18,21 @@ from magpylib._src.obj_classes.class_magnet_Sphere import Sphere
 
 def mesh_target(obj):
     """
-    create mesh for target objects
+    Create a mesh for target objects based on their type.
     """
-    if isinstance(obj, Cuboid):
-        return mesh_cuboid(obj)
-    if isinstance(obj, Sphere):
-        return mesh_sphere(obj)
-    if isinstance(obj, Cylinder):
-        return mesh_cylinder(obj)
-    if isinstance(obj, CylinderSegment):
-        return mesh_cylinder(obj)
-    raise RuntimeError("fktn `mesh_target`: should not be here!")
+    mesh_functions = {
+        Cuboid: mesh_cuboid,
+        Sphere: mesh_sphere,
+        Cylinder: mesh_cylinder,
+        CylinderSegment: mesh_cylinder,
+    }
+
+    for obj_type, mesh_func in mesh_functions.items():
+        if isinstance(obj, obj_type):
+            return mesh_func(obj)
+
+    msg = "Unsupported object type for meshing."
+    raise ValueError(msg)
 
 
 def mesh_sphere(obj):
@@ -139,13 +143,16 @@ def cells_from_dimension(
     # run all combinations of rounding methods, including parity matching to find the
     # closest triple with the target_elems constrain
     result = [funcs[0](k) for k in (a, b, c)]  # first guess
-    for funcs in product(*[funcs] * 3):
-        res = [f(k) for f, k in zip(funcs, (a, b, c))]
+    for fn in product(*[funcs] * 3):
+        res = [f(k) for f, k in zip(fn, (a, b, c))]
         epsilon_new = elems - np.prod(res)
-        if np.abs(epsilon_new) <= epsilon and all(r >= min_val for r in res):
-            if not strict_max or epsilon_new >= 0:
-                epsilon = np.abs(epsilon_new)
-                result = res
+        if (
+            np.abs(epsilon_new) <= epsilon
+            and all(r >= min_val for r in res)
+            and (not strict_max or epsilon_new >= 0)
+        ):
+            epsilon = np.abs(epsilon_new)
+            result = res
     return np.array(result).astype(int)
 
 
@@ -166,11 +173,12 @@ def mesh_cylinder(obj):
             360,
         )
     else:
-        raise TypeError("Input must be a Cylinder or CylinderSegment")
+        msg = "Input must be a Cylinder or CylinderSegment"
+        raise TypeError(msg)
 
     al = (r2 + r1) * 3.14 * (phi2 - phi1) / 360  # arclen = D*pi*arcratio
     dim = al, r2 - r1, h
-    # "unroll" the cylinder and distribute the target number of elemens along the
+    # "unroll" the cylinder and distribute the target number of elements along the
     # circumference, radius and height.
     nphi, nr, nh = cells_from_dimension(dim, n)
 

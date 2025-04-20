@@ -42,7 +42,7 @@ def getFT(sources, targets, anchor=None, eps=1e-5, squeeze=True):
     anchor: array_like, default=None
         The Force adds to the Torque via the anchor point. For a freely floating magnet
         this would be the barycenter. If `anchor=None`, this part of the Torque computation
-        is ommitted and a warning is thrown.
+        is omitted and a warning is thrown.
 
     eps: float, default=1e-5
         This is only used for magnet targets for computing the magnetic field gradient
@@ -115,7 +115,12 @@ def volume(target):
     if isinstance(target, CylinderSegment):
         r1, r2, h, phi1, phi2 = target.dimension
         return (r2**2 - r1**2) * np.pi * h * (phi2 - phi1) / 360
-    raise RuntimeError("fktn `volume` - I shouldt be here.")
+    supported_types = ["Cuboid", "Sphere", "Cylinder", "CylinderSegment"]
+    msg = (
+        f"Unsupported target type for volume computation: {type(target).__name__}. "
+        f"Supported types are: {', '.join(supported_types)}."
+    )
+    raise ValueError(msg)
 
 
 def getFTmagnet(sources, targets, eps=1e-5, anchor=None):
@@ -140,7 +145,7 @@ def getFTmagnet(sources, targets, eps=1e-5, anchor=None):
     anchor: array_like, default=None
         The Force adds to the Torque via the anchor point. For a freely floating magnet
         this would be the barycenter. If `anchor=None`, this part of the Torque computation
-        is ommitted.
+        is omitted.
     """
     # number of magnets
     tgt_number = len(targets)
@@ -229,7 +234,8 @@ def getFTcurrent_circ(sources, targets, anchor=None, eps=None):
             warnings.warn(
                 "Circle meshing parameter with low value detected. "
                 "This will give bad results. Please increase meshing. "
-                "Circle meshing defines the number of points on the circle."
+                "Circle meshing defines the number of points on the circle.",
+                stacklevel=2,
             )
         r = tgt.diameter / 2
         verts = np.zeros((3, n))
@@ -250,15 +256,14 @@ def getFTcurrent_circ(sources, targets, anchor=None, eps=None):
     return getFTcurrent(sources, new_targets, anchor, eps)
 
 
-# pylint: disable=unused-argument
-def getFTcurrent(sources, targets, anchor=None, eps=None):
+def getFTcurrent(sources, targets, anchor=None, eps=None):  # noqa:  ARG001
     """
     compute force acting on tgt Polyline
     eps is a dummy variable that is not used
 
     info:
     targets = Polyline objects
-    segements = linear segments within Polyline objects
+    segments = linear segments within Polyline objects
     instances = computation instances, each segment is split into `meshing` points
     """
     # number of Polylines

@@ -22,15 +22,18 @@ def check_input_anchor(anchor):
     if anchor is None:
         warnings.warn(
             "No anchor was handed to getFT. This results in incorrect "
-            "torque computation by excluding force contribution to torque."
+            "torque computation by excluding force contribution to torque.",
+            stacklevel=2,
         )
         return None
     if isinstance(anchor, (list, tuple)):
         anchor = np.array(anchor)
     if not isinstance(anchor, np.ndarray):
-        raise ValueError("Anchor input must be list tuple or array.")
+        msg = "Anchor input must be list tuple or array."
+        raise ValueError(msg)
     if anchor.shape != (3,):
-        raise ValueError("Anchor input must have shape (3,).")
+        msg = "Anchor input must have shape (3,)."
+        raise ValueError(msg)
     return anchor
 
 
@@ -42,22 +45,23 @@ def check_input_targets(targets):
         if not isinstance(
             t, (Cuboid, Polyline, Sphere, Cylinder, CylinderSegment, Circle)
         ):
-            raise ValueError(
+            msg = (
                 "Bad `targets` input for getFT."
                 " `targets` can only be Cuboids, Polylines, Spheres, Cylinders, "
                 " CylinderSegments, and Circles."
-                f" Instead receivd type {type(t)} target."
+                f" Instead received type {type(t)} target."
             )
+            raise ValueError(msg)
         if not hasattr(t, "meshing"):
-            raise ValueError(
+            msg = (
                 "Missing input for getFT `targets`."
                 " `targets` must have the `meshing` parameter set."
             )
-        if not isinstance(t, (Polyline,)):
-            if np.isscalar(t.meshing):
-                if t.meshing < 20:
-                    warnings.warn(
-                        "Input parameter `meshing` is set to a low value which will result in "
-                        "inaccurate computation of force and torque."
-                    )
+            raise ValueError(msg)
+        if not isinstance(t, (Polyline,)) and np.isscalar(t.meshing) and t.meshing < 20:
+            warnings.warn(
+                "Input parameter `meshing` is set to a low value which will result in "
+                "inaccurate computation of force and torque.",
+                stacklevel=2,
+            )
     return targets
