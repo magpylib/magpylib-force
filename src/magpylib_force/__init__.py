@@ -6,9 +6,8 @@ magpylib-force: Python package extending the Magpylib library that enables force
 
 from __future__ import annotations
 
-from ._version import version as __version__
-
 from magpylib_force.force import getFT
 
-__all__ = ["__version__", "getFT"]
+from ._version import version as __version__
 
+__all__ = ["__version__", "getFT"]

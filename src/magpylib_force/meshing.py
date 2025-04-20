@@ -2,16 +2,19 @@
 Object Meshing codes
 """
 
+from __future__ import annotations
+
 import itertools
 from itertools import product
 
 import numpy as np
 from magpylib._src.obj_classes.class_magnet_Cuboid import Cuboid
-from magpylib._src.obj_classes.class_magnet_Sphere import Sphere
 from magpylib._src.obj_classes.class_magnet_Cylinder import Cylinder
 from magpylib._src.obj_classes.class_magnet_CylinderSegment import CylinderSegment
+from magpylib._src.obj_classes.class_magnet_Sphere import Sphere
 
-#pylint: disable=too-many-locals
+# pylint: disable=too-many-locals
+
 
 def mesh_target(obj):
     """
@@ -32,16 +35,16 @@ def mesh_sphere(obj):
     """
     create sphere mesh from object meshing parameter
     """
-    n = obj.meshing          # target number of elements
-    n /= np.pi/6             # sphere volume VS cube volume ratio
-    n_grid = int(n**(1/3))   # splitting of cube sides
+    n = obj.meshing  # target number of elements
+    n /= np.pi / 6  # sphere volume VS cube volume ratio
+    n_grid = int(n ** (1 / 3))  # splitting of cube sides
 
     dia = obj.diameter
-    a = -dia/2+dia/(2*n_grid)
-    b =  dia/2-dia/(2*n_grid)
-    c = n_grid*1j
-    mesh = np.mgrid[a:b:c, a:b:c, a:b:c].T.reshape(n_grid**3,3)
-    return mesh[np.linalg.norm(mesh, axis=1)<dia/2]
+    a = -dia / 2 + dia / (2 * n_grid)
+    b = dia / 2 - dia / (2 * n_grid)
+    c = n_grid * 1j
+    mesh = np.mgrid[a:b:c, a:b:c, a:b:c].T.reshape(n_grid**3, 3)
+    return mesh[np.linalg.norm(mesh, axis=1) < dia / 2]
 
 
 def apportion_triple(triple, min_val=1, max_iter=30):
@@ -183,18 +186,20 @@ def mesh_cylinder(obj):
             # use a cylinder for the innermost cells if there are at least 3 layers and
             # if it is closed, use cylinder segments otherwise
             if nr >= 3 and r[r_ind] == 0 and phi2 - phi1 == 360:
-                cell = (0,0,pos_h)
+                cell = (0, 0, pos_h)
                 cells.append(cell)
             else:
                 for phi_ind in range(nphi_r):
                     radial_coord = (r[r_ind] + r[r_ind + 1]) / 2
                     angle_coord = (phi[phi_ind] + phi[phi_ind + 1]) / 2
 
-                    cell = (radial_coord * np.cos(np.deg2rad(angle_coord)),
-                            radial_coord * np.sin(np.deg2rad(angle_coord)),
-                            pos_h)
+                    cell = (
+                        radial_coord * np.cos(np.deg2rad(angle_coord)),
+                        radial_coord * np.sin(np.deg2rad(angle_coord)),
+                        pos_h,
+                    )
                     cells.append(cell)
-    #return _collection_from_obj_and_cells(cylinder, cells, **kwargs)
+    # return _collection_from_obj_and_cells(cylinder, cells, **kwargs)
     return np.array(cells)
 
 
@@ -205,21 +210,21 @@ def mesh_cuboid(obj):
     """
 
     if np.isscalar(obj.meshing):
-        n1,n2,n3 = cells_from_dimension(obj.dimension, obj.meshing)
+        n1, n2, n3 = cells_from_dimension(obj.dimension, obj.meshing)
     else:
-        n1,n2,n3 = obj.meshing
+        n1, n2, n3 = obj.meshing
 
-    a,b,c = obj.dimension
-    xs = np.linspace(-a/2, a/2, n1+1)
-    ys = np.linspace(-b/2, b/2, n2+1)
-    zs = np.linspace(-c/2, c/2, n3+1)
+    a, b, c = obj.dimension
+    xs = np.linspace(-a / 2, a / 2, n1 + 1)
+    ys = np.linspace(-b / 2, b / 2, n2 + 1)
+    zs = np.linspace(-c / 2, c / 2, n3 + 1)
 
-    dx = xs[1] - xs[0] if len(xs)>1 else a
-    dy = ys[1] - ys[0] if len(ys)>1 else b
-    dz = zs[1] - zs[0] if len(zs)>1 else c
+    dx = xs[1] - xs[0] if len(xs) > 1 else a
+    dy = ys[1] - ys[0] if len(ys) > 1 else b
+    dz = zs[1] - zs[0] if len(zs) > 1 else c
 
-    xs_cent = xs[:-1] + dx/2 if len(xs)>1 else xs + dx/2
-    ys_cent = ys[:-1] + dy/2 if len(ys)>1 else ys + dy/2
-    zs_cent = zs[:-1] + dz/2 if len(zs)>1 else zs + dz/2
+    xs_cent = xs[:-1] + dx / 2 if len(xs) > 1 else xs + dx / 2
+    ys_cent = ys[:-1] + dy / 2 if len(ys) > 1 else ys + dy / 2
+    zs_cent = zs[:-1] + dz / 2 if len(zs) > 1 else zs + dz / 2
 
     return np.array(list(itertools.product(xs_cent, ys_cent, zs_cent)))

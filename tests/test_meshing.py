@@ -1,6 +1,3 @@
-
-
-
 # import magpylib as magpy
 # cube = magpy.magnet.Cuboid(
 #     polarization=(0,0,1),
