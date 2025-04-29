@@ -1,0 +1,13 @@
+# Changes here will be overwritten by Copier; NEVER EDIT MANUALLY
+_commit: 2025.01.22-34-g133af09
+_src_path: gh:scientific-python/cookie
+backend: hatch
+email: magpylib@gmail.com
+full_name: Michael Ortner
+license: BSD
+org: magpylib
+project_name: magpylib-force
+project_short_description: Python package extending the Magpylib library that enables
+    force and torque computationss.
+url: https://github.com/magpylib/magpylib-force
+vcs: true
