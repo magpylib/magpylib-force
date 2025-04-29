@@ -264,3 +264,27 @@ def test_consistency_polyline_circle():
     F2, T2 = getFT(src, loop2, anchor=(0, 0, 0))
     assert abs(np.linalg.norm(F1 - F2) / np.linalg.norm(F1 + F2)) < 1e-7
     assert abs(np.linalg.norm(T1 - T2) / np.linalg.norm(T1 + T2)) < 1e-7
+
+
+def test_consistency_sphere_dipole():
+    """
+    force on sphere and dipole should be the same in nearly homogeneous field
+    """
+
+    src = magpy.current.Circle(diameter=10, current=123)
+    pos = (0, 0, 0)
+    diameter = 0.5
+    magnetization_sphere = np.array((1e6, 2e6, 3e6))
+    moment_dipole = magnetization_sphere * diameter**3 / 6 * np.pi
+
+    sphere = magpy.magnet.Sphere(
+        diameter=diameter, magnetization=magnetization_sphere, position=pos
+    )
+    sphere.meshing = 100
+
+    dipole = magpy.misc.Dipole(position=pos, moment=moment_dipole)
+
+    FT_sphere = getFT(src, sphere, anchor=(0, 0, 0))
+    FT_dipole = getFT(src, dipole, anchor=(0, 0, 0))
+
+    np.testing.assert_allclose(FT_sphere, FT_dipole, rtol=1e-6, atol=1e-6)
