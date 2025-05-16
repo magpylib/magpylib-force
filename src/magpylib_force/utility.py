@@ -13,6 +13,7 @@ from magpylib._src.obj_classes.class_magnet_Cuboid import Cuboid
 from magpylib._src.obj_classes.class_magnet_Cylinder import Cylinder
 from magpylib._src.obj_classes.class_magnet_CylinderSegment import CylinderSegment
 from magpylib._src.obj_classes.class_magnet_Sphere import Sphere
+from magpylib._src.obj_classes.class_misc_Dipole import Dipole
 
 
 def check_input_anchor(anchor):
@@ -43,7 +44,7 @@ def check_input_targets(targets):
         targets = [targets]
     for t in targets:
         if not isinstance(
-            t, Cuboid | Polyline | Sphere | Cylinder | CylinderSegment | Circle
+            t, Cuboid | Polyline | Sphere | Cylinder | CylinderSegment | Circle | Dipole
         ):
             msg = (
                 "Bad `targets` input for getFT."
@@ -52,16 +53,21 @@ def check_input_targets(targets):
                 f" Instead received type {type(t)} target."
             )
             raise ValueError(msg)
-        if not hasattr(t, "meshing"):
-            msg = (
-                "Missing input for getFT `targets`."
-                " `targets` must have the `meshing` parameter set."
-            )
-            raise ValueError(msg)
-        if not isinstance(t, Polyline) and np.isscalar(t.meshing) and t.meshing < 20:
-            warnings.warn(
-                "Input parameter `meshing` is set to a low value which will result in "
-                "inaccurate computation of force and torque.",
-                stacklevel=2,
-            )
+        if not isinstance(t, Dipole):
+            if not hasattr(t, "meshing"):
+                msg = (
+                    "Missing input for getFT `targets`."
+                    " `targets` must have the `meshing` parameter set."
+                )
+                raise ValueError(msg)
+            if (
+                not isinstance(t, Polyline)
+                and np.isscalar(t.meshing)
+                and t.meshing < 20
+            ):
+                warnings.warn(
+                    "Input parameter `meshing` is set to a low value which will result in "
+                    "inaccurate computation of force and torque.",
+                    stacklevel=2,
+                )
     return targets
